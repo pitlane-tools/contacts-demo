@@ -27,7 +27,7 @@ let middleware = [
     }),
 ] as const;
 
-declare module "remix/router" {
+declare module "remix" {
     interface RouterTypes {
         context: MiddlewareContext<typeof middleware>;
     }

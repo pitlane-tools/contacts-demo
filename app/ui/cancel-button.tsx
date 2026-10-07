@@ -1,4 +1,4 @@
-import { clientEntry, on } from "remix/ui";
+import { clientEntry, on } from "remix/component";
 
 export let CancelButton = clientEntry(import.meta.url, () => {
     return () => (

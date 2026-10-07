@@ -1,5 +1,5 @@
 import { FavoriteButton } from "#/actions/contacts/favorite-button.tsx";
-import { render } from "remix/ui/test";
+import { render } from "remix/component/test";
 import { describe, expect, it, onTestFinished } from "vitest";
 
 describe("FavoriteButton", () => {

@@ -10,7 +10,7 @@ task involves:
 - Imperative DOM access via `ref(...)`
 - Navigation behavior on non-anchor elements with `link(...)`
 - Native click, pointer, and keyboard behavior with `on(...)`, plus attributes with `attrs(...)`
-- Element-level animation mixins from `remix/ui/animation`
+- Element-level animation mixins from `@remix-run/ui/animation`
 
 For richer animation work (springs, tweens, layout transitions), see `animate-elements.md`. For
 authoring custom mixins, see `create-mixins.md`. For component lifecycle and updates, see
@@ -18,7 +18,7 @@ authoring custom mixins, see `create-mixins.md`. For component lifecycle and upd
 
 Compose behavior on host elements with `mix`. Pass a single mixin directly (`mix={on(...)}`), or
 an array when composing multiple mixins (`mix={[css(...), on(...)]}`). Core mixins are imported
-from `remix/ui`; animation mixins are imported from `remix/ui/animation`.
+from `remix/component`; animation mixins are imported from `@remix-run/ui/animation`.
 
 ## `on(type, handler, capture?)`
 

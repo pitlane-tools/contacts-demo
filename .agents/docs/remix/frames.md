@@ -5,7 +5,7 @@ A `<Frame>` renders server content into the page. Frames can stream in after the
 ## Basic usage
 
 ```tsx
-import { Frame } from 'remix/ui'
+import { Frame } from 'remix/component'
 
 function App() {
   return () => (
@@ -69,7 +69,7 @@ When a server frame response is itself rendered with `renderToStream()`, pass `f
 Client entries inside a frame can trigger a reload via `handle.frame.reload()`:
 
 ```tsx
-import { clientEntry, on, type Handle } from 'remix/ui'
+import { clientEntry, on, type Handle } from 'remix/component'
 
 export let RefreshButton = clientEntry(
   '/assets/refresh.js#RefreshButton',

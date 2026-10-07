@@ -100,16 +100,16 @@ tests.
 
 ## Component Tests
 
-Use `render(...)` from `remix/ui/test` for most component tests. It creates a real DOM container,
+Use `render(...)` from `remix/component/test` for most component tests. It creates a real DOM container,
 flushes the initial render, and returns `act(...)` so interactions can flush pending updates before
-assertions. Use `createRoot(container)` from `remix/ui` directly when a test needs explicit control
+assertions. Use `createRoot(container)` from `remix/component` directly when a test needs explicit control
 over root rendering, flushing, or disposal.
 
 ### Basic pattern
 
 ```tsx
 import * as assert from "remix/assert";
-import { render } from "remix/ui/test";
+import { render } from "remix/component/test";
 
 let result = render(<Counter />);
 

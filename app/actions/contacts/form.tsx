@@ -1,5 +1,5 @@
 import type { Contact } from "#/data/contacts.ts";
-import type { Handle } from "remix/ui";
+import type { Handle } from "remix/component";
 
 import { routes } from "#/routes.ts";
 import { CancelButton } from "#/ui/cancel-button.tsx";

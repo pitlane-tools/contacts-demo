@@ -1,7 +1,7 @@
 import { routes } from "#/routes.ts";
 import { isServer, onDestinationChange, pendingDestination } from "#/utils/pending-navigation.ts";
+import { clientEntry, type Handle, type SerializableProps } from "remix/component";
 import { createMultiMatcher } from "remix/route-pattern/match";
-import { clientEntry, type Handle, type SerializableProps } from "remix/ui";
 
 let matcher = createMultiMatcher<true>();
 matcher.add(routes.contacts.show.pattern, true);

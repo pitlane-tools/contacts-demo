@@ -1,6 +1,6 @@
 import type { PageMetadata } from "#/utils/page-metadata.ts";
+import type { RemixNode } from "remix/component";
 import type { RenderFunction } from "remix/middleware/render";
-import type { RemixNode } from "remix/ui";
 
 import { EditContact } from "#/actions/contacts/form.tsx";
 import { ContactNotFound } from "#/actions/contacts/not-found-page.tsx";

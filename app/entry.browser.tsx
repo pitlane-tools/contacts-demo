@@ -1,7 +1,7 @@
-import type { Handle } from "remix/ui";
+import type { Handle } from "remix/component";
 
 import { applyPageMetadata } from "#/utils/page-metadata.ts";
-import { createRoot, on, run } from "remix/ui";
+import { createRoot, on, run } from "remix/component";
 
 let app = run({
     async loadModule(moduleUrl, exportName) {
@@ -76,7 +76,7 @@ app.addEventListener("error", event => {
 });
 
 // Must be registered after `run` (last intercept() call wins for focusReset).
-// `remix/ui` never sets focusReset, so preserving focus across an enhanced
+// `remix/component` never sets focusReset, so preserving focus across an enhanced
 // navigation — the search input keeping focus while results stream in — is
 // still the app's job.
 navigation.addEventListener("navigate", event => {

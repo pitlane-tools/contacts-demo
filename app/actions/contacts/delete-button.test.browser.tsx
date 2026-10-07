@@ -1,5 +1,5 @@
 import { DeleteButton } from "#/actions/contacts/delete-button.tsx";
-import { render } from "remix/ui/test";
+import { render } from "remix/component/test";
 import { afterEach, describe, expect, it, onTestFinished, vi } from "vitest";
 
 function deleteForm() {

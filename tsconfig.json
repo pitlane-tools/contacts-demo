@@ -13,7 +13,7 @@
         ],
         "moduleResolution": "bundler",
         "jsx": "react-jsx",
-        "jsxImportSource": "remix/ui",
+        "jsxImportSource": "remix/component",
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "allowImportingTsExtensions": true,

@@ -1,5 +1,5 @@
 import type { Contact } from "#/data/contacts.ts";
-import type { Handle } from "remix/ui";
+import type { Handle } from "remix/component";
 
 import { DeleteButton } from "#/actions/contacts/delete-button.tsx";
 import { FavoriteButton } from "#/actions/contacts/favorite-button.tsx";

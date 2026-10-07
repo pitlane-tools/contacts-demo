@@ -1,5 +1,5 @@
 import { SidebarItem } from "#/actions/contacts/sidebar-item.tsx";
-import { render } from "remix/ui/test";
+import { render } from "remix/component/test";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 
 // `pending-navigation.ts` subscribes to the Navigation API at module scope,

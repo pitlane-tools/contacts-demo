@@ -10,8 +10,9 @@ involves:
 - Coordinating CSS transitions with the same easing as JS animations
 - Imperative animation loops via `requestAnimationFrame`
 
-Import animation APIs from `remix/ui/animation`. For the smaller set of animation helpers that
-show up alongside other mixins, see `mixins-styling-events.md`.
+Import animation APIs from `@remix-run/ui/animation`. Remix 3 ships them in the separate
+`@remix-run/ui` package, so install that dependency first. For the smaller set of animation
+helpers that show up alongside other mixins, see `mixins-styling-events.md`.
 
 ## Animation Mixins
 
@@ -164,7 +165,7 @@ mixins or CSS transitions with `spring` for most UI work. Use `tween` for impera
 `requestAnimationFrame` loops, canvas/WebGL, or non-CSS properties.
 
 ```tsx
-import { tween, easings } from "remix/ui/animation";
+import { tween, easings } from "@remix-run/ui/animation";
 
 let animation = tween({
     from: 0,

@@ -151,7 +151,7 @@ So the renderer never sees a `file:` entry ID and never consults an asset server
 
 **Decision:** Does this form need any JavaScript, or can the runtime drive it?
 
-**Heuristic:** Write the plain form first and stop there. `run()` from `remix/ui` already intercepts form submissions — GET _and_ POST — and routes them through frame reloads, so an ordinary `<form>` is already a client-side, frame-targeted submission with zero application code. Add a handler only when you need one of:
+**Heuristic:** Write the plain form first and stop there. `run()` from `remix/component` already intercepts form submissions — GET _and_ POST — and routes them through frame reloads, so an ordinary `<form>` is already a client-side, frame-targeted submission with zero application code. Add a handler only when you need one of:
 
 - A pre-submission guard (confirmation dialog) — an `on("submit")` listener that may `preventDefault()`.
 - Optimistic UI (show the result before the server responds) — a hand-driven `fetch()`.
@@ -293,7 +293,7 @@ This is **not** how ordinary POSTs work anymore — it is the optimism escape ha
 
 ```tsx
 import type { RequestMethod } from "remix/router";
-import type { Handle } from "remix/ui";
+import type { Handle } from "remix/component";
 
 export function RestfulForm(
     handle: Handle<JSX.IntrinsicHTMLElements["form"] & { method?: RequestMethod | "ANY" }>,
@@ -455,7 +455,7 @@ export let FavoriteButton = clientEntry(
 **The pattern** (`app/ui/search-bar.tsx`, in full):
 
 ```tsx
-import { clientEntry, type Handle, navigate, on } from "remix/ui";
+import { clientEntry, type Handle, navigate, on } from "remix/component";
 
 export let SearchBar = clientEntry(import.meta.url, (handle: Handle<{ query?: string }>) => {
     // `navigate()` settles when the targeted frame has finished swapping, so
@@ -532,7 +532,7 @@ export let SearchBar = clientEntry(import.meta.url, (handle: Handle<{ query?: st
 
 **Why `try/catch` around every `navigate`:** rapid typing means each call aborts the previous one, and the aborted transition rejects. Catching keeps those expected rejections from surfacing as unhandled rejections — and, in this app, from reaching the global `error` banner wired up in `app/entry.browser.tsx`.
 
-**Why focus survives:** `app/entry.browser.tsx` registers a `navigate` listener _after_ `run()` that calls `event.intercept({ focusReset: "manual" })`. `remix/ui` never sets `focusReset`, so without that the input would lose focus on each swap.
+**Why focus survives:** `app/entry.browser.tsx` registers a `navigate` listener _after_ `run()` that calls `event.intercept({ focusReset: "manual" })`. `remix/component` never sets `focusReset`, so without that the input would lose focus on each swap.
 
 ---
 
@@ -735,7 +735,7 @@ let middleware = [
     }),
 ] as const;
 
-declare module "remix/router" {
+declare module "remix" {
     interface RouterTypes {
         context: MiddlewareContext<typeof middleware>;
     }
@@ -953,7 +953,7 @@ let profile = s.parse(ProfileSchema, ctx.formData);
 
 **Decision:** How do I indicate that something is loading or in-progress?
 
-**Heuristic:** `remix/ui` has **no app-wide navigation bus**, by design. Derive pending state as locally as possible: first from the navigation you yourself started, then from the frame that is actually reloading, and only as a last resort from an app-owned subscription.
+**Heuristic:** `remix/component` has **no app-wide navigation bus**, by design. Derive pending state as locally as possible: first from the navigation you yourself started, then from the frame that is actually reloading, and only as a last resort from an app-owned subscription.
 
 **Decision order:**
 
@@ -1016,10 +1016,10 @@ No component in this app currently _listens_ for these events — search owns it
 **The whole client entry:**
 
 ```tsx
-import type { Handle } from "remix/ui";
+import type { Handle } from "remix/component";
 
 import { applyPageMetadata } from "#/utils/page-metadata.ts";
-import { createRoot, on, run } from "remix/ui";
+import { createRoot, on, run } from "remix/component";
 
 let app = run({
     async loadModule(moduleUrl, exportName) {
@@ -1091,7 +1091,7 @@ app.addEventListener("error", event => {
 });
 
 // Must be registered after `run` (last intercept() call wins for focusReset).
-// `remix/ui` never sets focusReset, so preserving focus across an enhanced
+// `remix/component` never sets focusReset, so preserving focus across an enhanced
 // navigation — the search input keeping focus while results stream in — is
 // still the app's job.
 navigation.addEventListener("navigate", event => {
@@ -1120,7 +1120,7 @@ navigation.addEventListener("navigate", event => {
 - Call `applyPageMetadata(response.headers)` on the way out, so a `detail`-frame swap updates `document.title` and the description meta tag. See Recipe 22 for why a partial frame swap needs this and a full-document navigation does not.
 - **Return the `Response`, not `response.body`.** The runtime unwraps it: a `Response` resolution is the only shape from which it can read `redirected` and `url`, and that is the signal it uses to start a replacing navigation so the address bar matches the swapped-in content. Return a body or a string and that re-sync is silently lost — a POST that ends in a redirect leaves the submitted action URL in the address bar while the redirect target's HTML renders. (Returning the body is legal, and fine for a resolver that only ever serves GETs, but there is no reason to give up the redirect information.)
 
-**Why the `focusReset` listener must come after `run()`.** Multiple `navigate` listeners may each call `event.intercept()`; for options like `focusReset` and `scroll`, the _last_ call wins. `remix/ui` never sets `focusReset`, so the browser's default (reset focus to the document) would apply and the search input would lose focus on every keystroke-driven frame update. Registering after `run()` makes the app's `{ focusReset: "manual" }` the winning option while leaving the runtime's `handler` — the actual frame reload — intact. There is no native equivalent to opt into; this listener is the reason it stays in the entry.
+**Why the `focusReset` listener must come after `run()`.** Multiple `navigate` listeners may each call `event.intercept()`; for options like `focusReset` and `scroll`, the _last_ call wins. `remix/component` never sets `focusReset`, so the browser's default (reset focus to the document) would apply and the search input would lose focus on every keystroke-driven frame update. Registering after `run()` makes the app's `{ focusReset: "manual" }` the winning option while leaving the runtime's `handler` — the actual frame reload — intact. There is no native equivalent to opt into; this listener is the reason it stays in the entry.
 
 **Why traverse navigations are skipped.** Back/forward navigations restore frame state from the history entry inside the runtime's own listener, which sets `scroll: 'manual'` and lets the Navigation API perform its deferred scroll restoration. Adding `focusReset: "manual"` there would fight that restoration, so the app returns early for `navigationType === "traverse"`, and for events it can't intercept or that someone already prevented.
 
@@ -1399,7 +1399,7 @@ The runtime's anchor path reads the attributes straight off the closest `a`/`are
 
 **Submitter attributes beat form attributes.** The runtime checks the submitter first and falls back to the `<form>` for every attribute in the vocabulary — the frame-targeting analogue of `formaction`. That only matters for one form with several submit buttons that should land their responses in _different_ frames. Reach for it then, and be aware of the cost: `ButtonHTMLProps` does not declare the `data-rmx-*` attributes (only `AnchorHTMLProps` and `FormHTMLProps` do), so a button-level override needs a small `createMixin` wrapper to set them. Put the attribute on the `<form>` whenever every submitter agrees, which is almost always.
 
-Do **not** reach for `remix/ui`'s own `link()` mixin here. On a non-anchor host it applies _link_ semantics: it sets `role="link"`, forces a button's `type` to `"button"`, and navigates from a `preventDefault`ed click — which cancels the form submission entirely.
+Do **not** reach for `remix/component`'s own `link()` mixin here. On a non-anchor host it applies _link_ semantics: it sets `role="link"`, forces a button's `type` to `"button"`, and navigates from a `preventDefault`ed click — which cancels the form submission entirely.
 
 **The attribute vocabulary the runtime reads:**
 
@@ -1991,7 +1991,7 @@ export default defineConfig({
 import { routes } from "#/routes.ts";
 import { isServer, onDestinationChange, pendingDestination } from "#/utils/pending-navigation.ts";
 import { createMultiMatcher } from "remix/route-pattern/match";
-import { clientEntry, type Handle, type SerializableProps } from "remix/ui";
+import { clientEntry, type Handle, type SerializableProps } from "remix/component";
 
 let matcher = createMultiMatcher<true>();
 matcher.add(routes.contacts.show.pattern, true);
@@ -2059,7 +2059,7 @@ export let SidebarItem = clientEntry(import.meta.url, (handle: Handle<SidebarIte
 **Why this is the one place a shared subscription survives.** Recipe 10's decision order rules out both cheaper options here:
 
 - The item can't `await navigate()`, because the runtime performs the navigation from the anchor itself; nothing in the component's own code starts it.
-- Frame `reloadStart`/`reloadComplete` can't drive it either, and this is the crux: when one item becomes active, the item **losing** active state must also re-render — and that component never received the click. It sits in the `sidebar` frame, which isn't the frame reloading (the click targets `detail`), so no frame event it can observe ever fires. `remix/ui` has no broadcast for "sibling components, your active state may have changed".
+- Frame `reloadStart`/`reloadComplete` can't drive it either, and this is the crux: when one item becomes active, the item **losing** active state must also re-render — and that component never received the click. It sits in the `sidebar` frame, which isn't the frame reloading (the click targets `detail`), so no frame event it can observe ever fires. `remix/component` has no broadcast for "sibling components, your active state may have changed".
 
 So the app owns a minimal primitive. `app/utils/pending-navigation.ts` is roughly 55 lines replacing a 111-line navigation state machine, and it exposes exactly three things:
 
@@ -2355,7 +2355,7 @@ import styles from "#/index.css?url";
 **The `css()` mixin for component-scoped rules:**
 
 ```tsx
-import { css } from "remix/ui";
+import { css } from "remix/component";
 
 <button
     mix={[
@@ -2414,7 +2414,7 @@ When a value changes based on state, set a CSS custom property via `style` and r
 **Basic ref (fires on insert):**
 
 ```tsx
-import { ref } from "remix/ui";
+import { ref } from "remix/component";
 
 <input mix={[ref(node => node.focus())]} />;
 ```
@@ -2452,12 +2452,12 @@ return () => (
 
 **Decision:** How do I add enter, exit, or layout animations to elements?
 
-**Heuristic:** Use the animation mixins — `animateEntrance()`, `animateExit()`, and `animateLayout()`. Always provide a stable `key` on elements that should transition.
+**Heuristic:** Use the animation mixins — `animateEntrance()`, `animateExit()`, and `animateLayout()`. They ship in the separate `@remix-run/ui` package, so add that dependency before importing from `@remix-run/ui/animation`. Always provide a stable `key` on elements that should transition.
 
 **Enter animation:**
 
 ```tsx
-import { animateEntrance } from "remix/ui/animation";
+import { animateEntrance } from "@remix-run/ui/animation";
 
 <div
     mix={[
@@ -2474,7 +2474,7 @@ import { animateEntrance } from "remix/ui/animation";
 **Toggle visibility with enter + exit:**
 
 ```tsx
-import { animateEntrance, animateExit } from "remix/ui/animation";
+import { animateEntrance, animateExit } from "@remix-run/ui/animation";
 
 {
     isVisible && (
@@ -2497,7 +2497,7 @@ import { animateEntrance, animateExit } from "remix/ui/animation";
 **List reordering with layout animation:**
 
 ```tsx
-import { animateLayout, spring } from "remix/ui/animation";
+import { animateLayout, spring } from "@remix-run/ui/animation";
 
 {
     items.map(item => (
@@ -2534,60 +2534,54 @@ import { animateLayout, spring } from "remix/ui/animation";
 
 **Decision:** I need keyboard shortcuts, key-specific handlers, or unified pointer+keyboard press behavior.
 
-**Heuristic:** Use the built-in interaction helpers from `remix/ui` instead of writing your own keyboard/pointer normalization. Frame-targeted navigation needs no helper at all — it is a plain `data-rmx-target` attribute (see Recipe 15).
+**Heuristic:** Reach for a real interactive element first — `<button>`, `<a>`, `<input>` — and let the platform supply the keyboard and pointer semantics. Remix 3 ships no key or press helpers: `remix/component` exports `on()`, and key dispatch is branching you write yourself. Frame-targeted navigation needs no helper at all — it is a plain `data-rmx-target` attribute (see Recipe 15).
 
-**`keysEvents()` — key-specific host events:**
+**Key-specific handling — branch inside one `keydown` listener:**
 
 ```tsx
-import { keysEvents } from "remix/ui";
+import { on } from "remix/component";
 
 <div
     tabindex="0"
     mix={[
-        keysEvents({
-            Escape() {
+        on("keydown", event => {
+            if (event.key === "Escape") {
                 closePanel();
                 handle.update();
-            },
-            ArrowDown(event) {
+                return;
+            }
+
+            if (event.key === "ArrowDown" || event.key === "ArrowUp") {
                 event.preventDefault();
-                focusNextItem();
-            },
-            ArrowUp(event) {
-                event.preventDefault();
-                focusPreviousItem();
-            },
+                if (event.key === "ArrowDown") focusNextItem();
+                else focusPreviousItem();
+            }
         }),
     ]}
 />;
 ```
 
-Use `keysEvents()` when you need to respond to specific keys on a focusable element. It handles `keydown` dispatch by key name so you don't need to write `if (event.key === "Escape")` branching yourself.
+Keep the listener on the element that owns focus, and `preventDefault()` only the keys you actually consume — arrow keys scroll the page otherwise.
 
-**`pressEvents()` — unified pointer and keyboard input:**
+**Press behavior — prefer a real `<button>`:**
 
 ```tsx
-import { pressEvents } from "remix/ui";
-
-<div
-    role="button"
-    tabindex="0"
+<button
     mix={[
-        pressEvents({
-            onPress() {
-                toggleSelection();
-                handle.update();
-            },
-            onLongPress() {
-                openContextMenu();
-                handle.update();
-            },
+        on("click", () => {
+            toggleSelection();
+            handle.update();
         }),
     ]}
-/>;
+    type="button"
+>
+    Select
+</button>
 ```
 
-Use `pressEvents()` when a non-button element needs to behave like an interactive control across both pointer and keyboard input. It normalizes click, touch, and Enter/Space into a single interaction model.
+A `<button>` already fires `click` for pointer taps, Enter, and Space, and it is focusable and announced as a control. When the host genuinely can't be a button, you own the whole contract: `role="button"`, `tabindex="0"`, an `on("click")` handler, and an `on("keydown")` that calls the same handler for `Enter` and `" "`. Long press has no built-in either — build it from `pointerdown`/`pointerup` and a timer, and only when the interaction is real.
+
+For the composite controls that need this machinery — menus, listboxes, comboboxes, selects, tabs — install `@remix-run/ui` and import the headless primitive (`@remix-run/ui/menu`, `@remix-run/ui/listbox`, …) rather than re-deriving focus and key handling.
 
 **Frame targeting needs no mixin.**
 
@@ -2599,7 +2593,7 @@ Set `data-rmx-target` directly on the `<a>` or `<form>` that navigates — both 
 </a>
 ```
 
-Prefer real `<a>` tags and `<form><button type="submit">` pairs — they're accessible and work without JavaScript. `remix/ui` also exports a `link()` mixin that makes any element behave like a navigation link, but it is a _link_ mixin: on a non-anchor host it sets `role="link"` and navigates from a `preventDefault`ed click. Reserve it for cases where an anchor isn't practical, and never put it on a submit button — it would cancel the submission.
+Prefer real `<a>` tags and `<form><button type="submit">` pairs — they're accessible and work without JavaScript. `remix/component` also exports a `link()` mixin that makes any element behave like a navigation link, but it is a _link_ mixin: on a non-anchor host it sets `role="link"` and navigates from a `preventDefault`ed click. Reserve it for cases where an anchor isn't practical, and never put it on a submit button — it would cancel the submission.
 
 ---
 
@@ -2768,7 +2762,7 @@ on("pointerdown", event => {
 **Basic mixin — pure prop transform:**
 
 ```tsx
-import { createMixin } from "remix/ui";
+import { createMixin } from "remix/component";
 
 let withTitle = createMixin(() => (title: string, props: { title?: string }) => (
     <handle.element {...props} title={title} />
@@ -2954,11 +2948,11 @@ describe("missing contacts", () => {
 
 This runs the whole stack — middleware, method override, router, controller, render middleware, D1. `SELF` from `cloudflare:test` does the same thing and is deprecated in favour of the above.
 
-**Component test** — `render()` from `remix/ui/test` works unchanged under jsdom:
+**Component test** — `render()` from `remix/component/test` works unchanged under jsdom:
 
 ```tsx
 import { describe, expect, it, onTestFinished } from "vitest";
-import { render } from "remix/ui/test";
+import { render } from "remix/component/test";
 
 describe("FavoriteButton", () => {
     it("shows the current state but submits the desired one", () => {
@@ -3572,7 +3566,7 @@ The `#` prefix is the only one that works everywhere without configuration beyon
         "types": ["@types/node", "vite-plus/client", "@pitlane/dev/assets"],
         "moduleResolution": "bundler",
         "jsx": "react-jsx",
-        "jsxImportSource": "remix/ui",
+        "jsxImportSource": "remix/component",
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "allowImportingTsExtensions": true,

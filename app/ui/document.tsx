@@ -1,4 +1,4 @@
-import type { Handle } from "remix/ui";
+import type { Handle } from "remix/component";
 
 import { SITE } from "#/data/meta.ts";
 import { searchQuery } from "#/data/schemas.ts";
@@ -9,8 +9,8 @@ import { routes } from "#/routes.ts";
 import { SearchBar } from "#/ui/search-bar.tsx";
 import { mergeAssets } from "@pitlane/dev/runtime";
 import { HMR } from "pitlane:dev";
+import { Frame } from "remix/component";
 import { getContext } from "remix/middleware/async-context";
-import { Frame } from "remix/ui";
 
 import { RestfulForm } from "./restful-form.tsx";
 

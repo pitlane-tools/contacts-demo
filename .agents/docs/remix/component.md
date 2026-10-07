@@ -1,17 +1,14 @@
 # component
 
-A minimal component system built on JavaScript and DOM primitives. Write components that render on the server, stream to the browser, and hydrate only where you need interactivity.
+A minimal component system built on JavaScript and DOM primitives. Write components that render on
+the server, stream to the browser, and hydrate only where you need interactivity.
 
 ## Features
 
-- **JSX Runtime** - Convenient JSX syntax
-- **Component State** - State managed with plain JavaScript variables
-- **Manual Updates** - Explicit control over when components update via `handle.update()`
-- **Real DOM Events** - Use the `on()` mixin and native `EventTarget` APIs
-- **Inline CSS** - `css(...)` mixin with pseudo-selectors and nested rules
-- **Server Rendering** - Stream full pages or fragments with `renderToStream`
-- **Hydration** - Mark interactive components with `clientEntry` and hydrate them on the client with `run`
-- **Frames** - `<Frame>` streams partial server UI into the page and can be reloaded without a full page navigation
+- Component runtime APIs for rendering, hydration, link and form frame navigation, and JSX
+- Server rendering APIs for streaming component trees and frames
+- `mix` composition with event, ref, and CSS helpers
+- Lower-level utilities for events, refs, attributes, and rendering lifecycle
 
 ## Installation
 
@@ -19,81 +16,42 @@ A minimal component system built on JavaScript and DOM primitives. Write compone
 npm i remix
 ```
 
-## Quick Start
+## Usage
 
-### Server
-
-Install the standard render middleware and render a full page from an action:
+Components receive a handle and return a render function. Local state stays in ordinary JavaScript
+variables, and `handle.update()` explicitly schedules another render:
 
 ```tsx
-import { render } from 'remix/middleware/render'
-import { createRouter } from 'remix/router'
-import { Frame } from 'remix/ui'
-import { Counter } from './assets/counter.tsx'
+import { on } from 'remix/component'
+import type { Handle } from 'remix/component'
 
-function App() {
+function Counter(handle: Handle<{ initialCount?: number }>) {
+  let count = handle.props.initialCount ?? 0
+
   return () => (
-    <html>
-      <head>
-        <title>My App</title>
-        <script async type="module" src="/assets/entry.js" />
-      </head>
-      <body>
-        <h1>Hello</h1>
-        <Counter initialCount={0} label="Clicks" />
-        <Frame src="/sidebar" fallback={<div>Loading...</div>} />
-      </body>
-    </html>
+    <button
+      type="button"
+      mix={on('click', () => {
+        count++
+        void handle.update()
+      })}
+    >
+      Count: {count}
+    </button>
   )
 }
-
-let router = createRouter({ middleware: [render()] })
-
-router.get('/', (context) => context.render(<App />))
-router.get('/sidebar', (context) => context.render(<nav>Sidebar</nav>))
 ```
 
-### Client Entry
+## Custom Mixins
 
-Mark components that need client-side interactivity with `clientEntry`. They render on the server and hydrate on the client:
+Use `createMixin(...)` to share host behavior, manage DOM resources, or provide default props. The [Mixins guide](https://github.com/remix-run/remix/blob/main/packages/component/docs/mixins.md) covers setup and render, `MixinHandle`, lifecycle events, and deferred removal with `beforeRemove` and `event.persistNode(...)`.
 
-```tsx
-import { clientEntry, on, type Handle } from 'remix/ui'
+## Client Entry Loading
 
-export let Counter = clientEntry(
-  '/assets/counter.js#Counter',
-  function Counter(handle: Handle<{ initialCount?: number; label: string }>) {
-    let count = handle.props.initialCount ?? 0
-
-    return () => (
-      <div>
-        <span>
-          {handle.props.label}: {count}
-        </span>
-        <button
-          mix={[
-            on('click', () => {
-              count++
-              handle.update()
-            }),
-          ]}
-        >
-          +
-        </button>
-      </div>
-    )
-  },
-)
-```
-
-The first argument is the module URL and export name the client will use to load this component. The component renders on the server like any other component, and the client hydrates it in place, preserving the server-rendered HTML.
-
-### Client
-
-Boot the client with `run`. It finds all client entries in the page, loads their modules, and hydrates them:
+`run()` hydrates client entries by calling `loadModule` for each component module:
 
 ```tsx
-import { run } from 'remix/ui'
+import { run } from 'remix/component'
 
 let app = run({
   async loadModule(moduleUrl, exportName) {
@@ -105,618 +63,214 @@ let app = run({
 await app.ready()
 ```
 
-`run()` fetches frame sources by default, including the submitted method, encoding, and `FormData`.
-Provide `resolveFrame` only when the app needs custom request headers, body encoding, or response
-policy. Add `data-rmx-document` to a link or form to leave its navigation to the browser.
-
-### Frames
-
-`<Frame>` renders server content into the page. Frames can stream in after the initial HTML, nest other frames, and contain client entries. They can be reloaded from the client without a full page navigation:
+Client entries introduced after the initial document may depend on import maps added at runtime.
+When targeting browsers without native support for multiple import maps, use
+`remix/multiple-import-maps-polyfill` to load these modules and process their preloads:
 
 ```tsx
-<Frame src="/sidebar" fallback={<div>Loading sidebar...</div>} />
-```
-
-Client entries inside a frame can trigger a reload:
-
-```tsx
-function RefreshButton(handle: Handle) {
-  return () => (
-    <button
-      mix={[
-        on('click', () => {
-          handle.frame.reload()
-        }),
-      ]}
-    >
-      Refresh
-    </button>
-  )
-}
-```
-
-When a frame reloads, its server HTML is re-fetched and diffed into the page. Client entries inside the frame receive updated props from the server while preserving their local state.
-
-You can also name frames and reload adjacent ones:
-
-```tsx
-<Frame name="cart-summary" src="/cart-summary" />
-<Frame src="/cart-row" />
-```
-
-```tsx
-function CartRow(handle: Handle) {
-  return () => (
-    <button
-      mix={[
-        on('click', async () => {
-          await handle.frames.get('cart-summary')?.reload()
-          await handle.frame.reload()
-        }),
-      ]}
-    >
-      Save
-    </button>
-  )
-}
-```
-
-When a frame reloads, its server HTML is re-fetched and diffed into the page. Client entries inside the frame receive updated props from the server while preserving their local state.
-
-## Components
-
-All components receive a handle and return a render function. The component function runs **once** when the component is first created, and the returned render function runs on the first render and **every update** afterward:
-
-```tsx
-function Counter(handle: Handle<{ initialCount?: number; label?: string }>) {
-  // Component function: runs once
-  let count = handle.props.initialCount ?? 0
-
-  // Return render function: runs on every update
-  return () => (
-    <div>
-      {handle.props.label || 'Count'}: {count}
-      <button
-        mix={[
-          on('click', () => {
-            count++
-            handle.update()
-          }),
-        ]}
-      >
-        Increment
-      </button>
-    </div>
-  )
-}
-```
-
-### Props On The Handle
-
-Props are available on `handle.props` in both the component function and the render function:
-
-1. **Component function** - Runs once and can initialize state from `handle.props`.
-2. **Render phase** - The returned function runs on initial render and every update afterward, reading the latest values from `handle.props`.
-
-`handle.props` is a stable object. Its identity stays the same across updates while its property values are updated before each render.
-
-```tsx
-let el = <Counter initialCount={5} label="Total" />
-
-function Counter(handle: Handle<{ initialCount: number; label?: string }>) {
-  let count = handle.props.initialCount
-
-  return () => (
-    <div>
-      {handle.props.label}: {count}
-    </div>
-  )
-}
-```
-
-## Events
-
-Events use the `on()` mixin. Listeners receive an `AbortSignal` that's aborted when the component is disconnected or the handler is re-entered.
-
-```tsx
-function SearchInput(handle: Handle) {
-  let query = ''
-
-  return () => (
-    <input
-      type="text"
-      value={query}
-      mix={[
-        on('input', (event, signal) => {
-          query = event.currentTarget.value
-          handle.update()
-
-          // Pass the signal to abort the fetch on re-entry or node removal
-          // This avoids race conditions in the UI and manages cleanup
-          fetch(`/search?q=${query}`, { signal })
-            .then((res) => res.json())
-            .then((results) => {
-              if (signal.aborted) return
-              // Update results
-            })
-        }),
-      ]}
-    />
-  )
-}
-```
-
-A resize event applies to the whole viewport, so register it on `window` after the first client render. Pass `handle.signal` so the listener is removed when the component disconnects:
-
-```tsx
-function ViewportWidth(handle: Handle) {
-  let width: number | undefined
-
-  handle.queueTask(() => {
-    width = window.innerWidth
-    window.addEventListener(
-      'resize',
-      () => {
-        width = window.innerWidth
-        handle.update()
-      },
-      { signal: handle.signal },
-    )
-    handle.update()
-  })
-
-  return () => <div>{width === undefined ? 'Measuring…' : `${width}px`}</div>
-}
-```
-
-## CSS Mixin
-
-Use the `css(...)` mixin for inline styles with pseudo-selectors and nested rules:
-
-```tsx
-function Button(handle: Handle) {
-  return () => (
-    <button
-      mix={[
-        css({
-          color: 'white',
-          backgroundColor: 'blue',
-          '&:hover': {
-            backgroundColor: 'darkblue',
-          },
-          '&:active': {
-            transform: 'scale(0.98)',
-          },
-        }),
-      ]}
-    >
-      Click me
-    </button>
-  )
-}
-```
-
-The syntax mirrors modern CSS nesting, but in object form. Use `&` to reference the current element in pseudo-selectors, pseudo-elements, and attribute selectors. Use class names or other selectors directly for child selectors:
-
-```css
-.button {
-  color: white;
-  background-color: blue;
-
-  &:hover {
-    background-color: darkblue;
-  }
-
-  &::before {
-    content: '';
-    position: absolute;
-  }
-
-  &[aria-selected='true'] {
-    border: 2px solid yellow;
-  }
-
-  .icon {
-    width: 16px;
-    height: 16px;
-  }
-
-  @media (max-width: 768px) {
-    padding: 8px;
-  }
-}
-```
-
-```tsx
-function Button(handle: Handle) {
-  return () => (
-    <button
-      mix={[
-        css({
-          color: 'white',
-          backgroundColor: 'blue',
-          '&:hover': {
-            backgroundColor: 'darkblue',
-          },
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-          },
-          '&[aria-selected="true"]': {
-            border: '2px solid yellow',
-          },
-          '.icon': {
-            width: '16px',
-            height: '16px',
-          },
-          '@media (max-width: 768px)': {
-            padding: '8px',
-          },
-        }),
-      ]}
-    >
-      <span class="icon">★</span>
-      Click me
-    </button>
-  )
-}
-```
-
-## Ref Mixin
-
-Use the `ref(...)` mixin to get a reference to the DOM node after it's rendered. This is useful for DOM operations like focusing elements, scrolling, or measuring dimensions.
-
-```tsx
-function Form(handle: Handle) {
-  let inputRef: HTMLInputElement
-
-  return () => (
-    <form>
-      <input
-        type="text"
-        // get the input node
-        mix={[ref((node) => (inputRef = node))]}
-      />
-      <button
-        mix={[
-          on('click', () => {
-            // Select it from other parts of the form
-            inputRef.select()
-          }),
-        ]}
-      >
-        Focus Input
-      </button>
-    </form>
-  )
-}
-```
-
-The `ref` callback receives an `AbortSignal` as its second parameter, which is aborted when the element is removed from the DOM:
-
-```tsx
-function Component(handle: Handle) {
-  return () => (
-    <div
-      mix={[
-        ref((node, signal) => {
-          // Set up something that needs cleanup
-          let observer = new ResizeObserver(() => {
-            // handle resize
-          })
-          observer.observe(node)
-
-          // Clean up when element is removed
-          signal.addEventListener('abort', () => {
-            observer.disconnect()
-          })
-        }),
-      ]}
-    >
-      Content
-    </div>
-  )
-}
-```
-
-## Component Handle API
-
-Components receive a `Handle` as their first argument with the following API:
-
-- **`handle.update()`** - Schedule an update and await completion to get an `AbortSignal`.
-- **`handle.queueTask(task)`** - Schedule a task to run after the next update. Useful for DOM operations that need to happen after rendering (e.g., moving focus, scrolling, measuring elements, etc.).
-- **`handle.signal`** - An `AbortSignal` that's aborted when the component is disconnected. Useful for cleanup.
-- **`handle.id`** - Stable identifier per component instance.
-- **`handle.context`** - Context API for ancestor/descendant communication.
-- **`handle.frame`** - The component's closest frame. Call `handle.frame.reload()` to refresh the frame's server content.
-- **`handle.frames.get(name)`** - Look up named frames in the current runtime tree for adjacent frame reloads.
-
-### `handle.update()`
-
-Schedule an update and optionally await completion to coordinate post-update work.
-
-```tsx
-function Counter(handle: Handle) {
-  let count = 0
-
-  return () => (
-    <button
-      mix={[
-        on('click', () => {
-          count++
-          handle.update()
-        }),
-      ]}
-    >
-      Count: {count}
-    </button>
-  )
-}
-```
-
-You can await the update before doing DOM work:
-
-```tsx
-function Player(handle: Handle) {
-  let isPlaying = false
-  let playButton: HTMLButtonElement
-  let stopButton: HTMLButtonElement
-
-  return () => (
-    <div>
-      <button
-        disabled={isPlaying}
-        mix={[
-          ref((node) => (playButton = node)),
-          on('click', async () => {
-            isPlaying = true
-            await handle.update()
-            // Focus the enabled button after update completes
-            stopButton.focus()
-          }),
-        ]}
-      >
-        Play
-      </button>
-      <button
-        disabled={!isPlaying}
-        mix={[
-          ref((node) => (stopButton = node)),
-          on('click', async () => {
-            isPlaying = false
-            await handle.update()
-            // Focus the enabled button after update completes
-            playButton.focus()
-          }),
-        ]}
-      >
-        Stop
-      </button>
-    </div>
-  )
-}
-```
-
-### `handle.queueTask(task)`
-
-Schedule a task to run after the next update. Useful for DOM operations that need to happen after rendering (e.g., moving focus, scrolling, measuring elements).
-
-```tsx
-function Form(handle: Handle) {
-  let showDetails = false
-  let detailsSection: HTMLElement
-
-  return () => (
-    <form>
-      <label>
-        <input
-          type="checkbox"
-          checked={showDetails}
-          mix={[
-            on('change', (event) => {
-              showDetails = event.currentTarget.checked
-              handle.update()
-              if (showDetails) {
-                // Scroll to the expanded section after it renders
-                handle.queueTask(() => {
-                  detailsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                })
-              }
-            }),
-          ]}
-        />
-        Show additional details
-      </label>
-      {showDetails && (
-        <section
-          mix={[
-            css({
-              marginTop: '2rem',
-              padding: '1rem',
-              border: '1px solid #ccc',
-            }),
-            ref((node) => (detailsSection = node)),
-          ]}
-        >
-          <h2>Additional Details</h2>
-          <p>This section appears when the checkbox is checked.</p>
-        </section>
-      )}
-    </form>
-  )
-}
-```
-
-### Native Event Listeners
-
-Use native [EventTarget.addEventListener()](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) for targets such as `window` and `document`. Schedule browser-only setup with `handle.queueTask()`, and pass `handle.signal` so the listener is removed when the component disconnects.
-
-```tsx
-function ViewportWidth(handle: Handle) {
-  let width: number | undefined
-
-  handle.queueTask(() => {
-    width = window.innerWidth
-    window.addEventListener(
-      'resize',
-      () => {
-        width = window.innerWidth
-        handle.update()
-      },
-      { signal: handle.signal },
-    )
-    handle.update()
-  })
-
-  return () => <div>{width === undefined ? 'Measuring…' : `${width}px`}</div>
-}
-```
-
-### `handle.signal`
-
-An `AbortSignal` that's aborted when the component is disconnected. Useful for cleanup operations.
-
-```tsx
-function Clock(handle: Handle) {
-  let interval = setInterval(() => {
-    // clear the interval when the component is disconnected
-    if (handle.signal.aborted) {
-      clearInterval(interval)
-      return
+import {
+  detectMultipleImportMapSupport,
+  importModule,
+  preloadShim,
+} from 'remix/multiple-import-maps-polyfill'
+
+let app = run({
+  async loadModule(moduleUrl, exportName) {
+    let module = await importModule(moduleUrl)
+    let Component = module[exportName]
+    if (typeof Component !== 'function') {
+      throw new Error(`Unknown component: ${moduleUrl}#${exportName}`)
     }
-    handle.update()
-  }, 1000)
-  return () => <span>{new Date().toString()}</span>
-}
+    return Component
+  },
+  async processClientEntryPreloads(preloads) {
+    if (await detectMultipleImportMapSupport()) return preloads
+
+    preloadShim(preloads)
+    return []
+  },
+})
 ```
 
-### `handle.id`
+## Frame Navigation
 
-Stable identifier per component instance. Useful for HTML APIs like `htmlFor`, `aria-owns`, etc. so consumers don't have to supply an id.
+The same runtime represents the current document as `app.frames.top` and intercepts eligible
+same-origin links and forms through the browser's Navigation API. Those navigations fetch HTML with
+the frame resolver and update the existing document in place instead of loading a new document.
+This soft-navigation behavior applies even when the page only uses `clientEntry()` and does not
+render an explicit `<Frame>`.
 
-```tsx
-function LabeledInput(handle: Handle) {
-  return () => (
-    <div>
-      <label htmlFor={handle.id}>Name</label>
-      <input id={handle.id} type="text" />
-    </div>
-  )
-}
-```
+Frame navigation requires both `window.navigation` and `NavigateEvent.sourceElement`. Browsers
+missing either capability use document navigation for links, forms, and `navigate()`. Hydration and
+explicit frame reloads still work.
 
-### `handle.context`
+The default resolver sends `X-Remix-Frame: true` for every request, including top-frame navigation and reloads. Named frames also send `X-Remix-Target`; top-frame and unnamed frame requests omit the target. It only fetches same-origin sources and follows same-origin redirects.
 
-Context API for ancestor/descendant communication. All components are potential context providers and consumers. Use `handle.context.set()` to provide values and `handle.context.get()` to consume them.
+The default browser resolver omits `X-Remix-Top-Frame-Src`. When `render()` middleware handles these requests, the server-rendered `handle.frames.top.src` defaults to the requested frame's URL.
 
-```tsx
-function App(handle: Handle<Record<string, never>, { theme: string }>) {
-  handle.context.set({ theme: 'dark' })
+The default resolver is equivalent to:
 
-  return () => (
-    <div>
-      <Header />
-      <Content />
-    </div>
-  )
-}
+```js
+async function resolveFrame(src, options) {
+  let headers = new Headers({ Accept: 'text/html', 'X-Remix-Frame': 'true' })
+  if (options?.target != null) headers.set('X-Remix-Target', options.target)
 
-function Header(handle: Handle) {
-  // Consume context from App
-  let { theme } = handle.context.get(App)
-  return () => (
-    <header mix={[css({ backgroundColor: theme === 'dark' ? '#000' : '#fff' })]}>Header</header>
-  )
-}
-```
+  let response = await fetch(src, {
+    body: getRequestBody(options),
+    headers,
+    method: options?.method,
+    mode: 'same-origin',
+    signal: options?.signal,
+  })
 
-Setting context values does not automatically trigger updates. If a provider needs to render its own context values, call `handle.update()` after setting them. However, since providers often don't render context values themselves, calling `update()` can cause expensive updates of the entire subtree. Instead, make your context an [EventTarget](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget) and have consumers subscribe to changes.
-
-```tsx
-import { TypedEventTarget } from 'remix/ui'
-
-class Theme extends TypedEventTarget<{ change: Event }> {
-  #value: 'light' | 'dark' = 'light'
-
-  get value() {
-    return this.#value
+  let isHtml = response.headers.get('Content-Type')?.toLowerCase().includes('text/html')
+  if (response.status >= 500 || (response.status >= 300 && !isHtml)) {
+    throw new Error(`Failed to resolve frame: ${response.status} ${response.statusText}`.trimEnd())
   }
 
-  setValue(value: string) {
-    this.#value = value
-    this.dispatchEvent(new Event('change'))
+  return response
+}
+
+function getRequestBody(options) {
+  let formData = options?.formData
+  let method = options?.method
+  if (!formData || !method || ['get', 'head'].includes(method.toLowerCase())) return
+
+  if (options?.encType === 'text/plain') {
+    let body = ''
+    for (let [name, value] of formData) {
+      name = normalizeLineBreaks(name)
+      value = normalizeLineBreaks(typeof value === 'string' ? value : value.name)
+      body += `${name}=${value}\r\n`
+    }
+    return new Blob([body], { type: 'text/plain' })
   }
+
+  if (options?.encType !== 'application/x-www-form-urlencoded') return formData
+
+  let body = new URLSearchParams()
+  for (let [name, value] of formData) {
+    body.append(name, typeof value === 'string' ? value : value.name)
+  }
+  return body
 }
 
-function App(handle: Handle<Record<string, never>, Theme>) {
-  let theme = new Theme()
-  handle.context.set(theme)
-
-  return () => (
-    <div>
-      <button
-        mix={[
-          on('click', () => {
-            // no updates in the parent component
-            theme.setValue(theme.value === 'light' ? 'dark' : 'light')
-          }),
-        ]}
-      >
-        Toggle Theme
-      </button>
-      <ThemedContent />
-    </div>
-  )
-}
-
-function ThemedContent(handle: Handle) {
-  let theme = handle.context.get(App)
-
-  // Subscribe to theme changes and update when it changes
-  theme.addEventListener('change', () => handle.update(), { signal: handle.signal })
-
-  return () => (
-    <div mix={[css({ backgroundColor: theme.value === 'dark' ? '#000' : '#fff' })]}>
-      Current theme: {theme.value}
-    </div>
-  )
+function normalizeLineBreaks(value) {
+  return value.replace(/\r\n|\r|\n/g, '\r\n')
 }
 ```
 
-## Fragments
+The default resolver requests HTML. GET form values are already encoded in `src`;
+`application/x-www-form-urlencoded` submissions use `URLSearchParams`, `text/plain` submissions use
+CRLF-delimited text, and `multipart/form-data` submissions use `FormData`. Pass a custom
+`resolveFrame` when the server requires additional headers, another body encoding, or a different
+response policy.
 
-Use `Fragment` to group elements without adding extra DOM nodes:
+Add `data-rmx-document` to a link or form to leave that navigation to the browser. To keep all links
+and forms as document navigations while still hydrating client entries and using explicit frames,
+register a listener before calling `run()`:
+
+```ts
+window.navigation?.addEventListener('navigate', (e) => e.stopImmediatePropagation())
+```
+
+This prevents Remix from intercepting Navigation API events. Explicit frame reloads such as
+`handle.frame.reload()` continue to use the frame resolver.
+
+The default resolver accepts `2xx` responses and `3xx` or `4xx` responses whose `Content-Type` includes `text/html`, ignoring case. It rejects other `3xx` or `4xx` responses and all `5xx` responses with an error containing their status and status text. A custom `resolveFrame` may return a `Response` with any status when it wants the component runtime to render the response body.
+
+Forms remain ordinary HTML forms before the runtime starts. Add `data-rmx-target` to reload a named frame, or `data-rmx-document` to require a full-document submission:
 
 ```tsx
-function List(handle: Handle) {
+import { Frame } from 'remix/component'
+
+function AccountPage() {
   return () => (
     <>
-      <li>Item 1</li>
-      <li>Item 2</li>
-      <li>Item 3</li>
+      <Frame name="account" src="/account/edit" />
+      <form action="/account/edit" method="post" data-rmx-target="account">
+        <label for="display-name">Display name</label>
+        <input id="display-name" name="displayName" required />
+        <button type="submit">Save</button>
+      </form>
     </>
   )
 }
 ```
 
-## Documentation
+Native constraint validation and submitter overrides still apply. GET form values arrive in `src`; non-GET forms provide `formData`, `method`, and `encType` to the resolver. See [Frames](https://github.com/remix-run/remix/blob/main/packages/component/docs/frames.md#form-navigation) for targeting, history behavior, request encoding, opt-outs, and server response guidance.
 
-- [Getting Started](./getting-started.md)
-- [Components](./components.md)
-- [Handle API](./handle.md)
-- [Server](../src/server/README.md)
-- [Hydration](./hydration.md)
-- [Frames](./frames.md)
-- [Styling](./styling.md)
-- [Events](./events.md)
-- [Interactions](./interactions.md)
-- [Context](./context.md)
-- [Composition](./composition.md)
-- [Patterns](./patterns.md)
-- [Test](../src/test/README.md)
-- Animations
-  - [spring](./spring.md)
-  - [tween](./tween.md)
-- [Server](../src/server/README.md)
+Use `data-rmx-history="push|replace"` on an enhanced anchor or form to control how the navigation updates history. This can override the automatic replacement used for non-GET form submissions to the current URL.
+
+## Single-page Applications
+
+Use `render` and `run` from `remix/spa` when every route runs in the browser and returns a component
+tree instead of an HTTP response body. The render middleware keeps the router's standard `Request`
+to `Response` contract while associating the response with a node for the top frame to render:
+
+```tsx
+import { createRouter } from 'remix/router'
+import { render, run } from 'remix/spa'
+
+let router = createRouter({ middleware: [render()] })
+
+router.get('/', ({ render }) => render(<h1>Home</h1>))
+router.get('/about', ({ render }) => render(<h1>About</h1>))
+
+function LoadingPage() {
+  return () => <p role="status">Loading…</p>
+}
+
+let app = run(router, { fallback: <LoadingPage /> })
+await app.ready()
+```
+
+The optional `fallback` is a live Remix node displayed while the initial route loads.
+`app.ready()` resolves after the initial URL has replaced it with the routed node. The runtime then
+reuses frame navigation for same-origin links, forms, history traversal, redirects, cancellation,
+and `rmx-target`.
+
+## Preserving Client-Owned DOM
+
+Use `data-rmx-preserve-dom` on the smallest element whose live DOM should belong to client code after initial render, such as a custom element or third-party widget:
+
+```tsx
+<pagefind-ui data-rmx-key="search" data-rmx-preserve-dom>
+  <button type="button">Search</button>
+</pagefind-ui>
+```
+
+The component runtime still renders the element's children during SSR and still hydrates any initial client entries inside it. On later frame reloads, matched `data-rmx-preserve-dom` elements keep their current attributes and children instead of accepting incoming DOM updates. See [Preserving client-owned DOM](https://github.com/remix-run/remix/blob/main/packages/component/docs/frames.md#preserving-client-owned-dom) for guidance and caveats.
+
+Use `data-rmx-preserve-attrs` when client code owns only specific attributes, such as a theme set on `<html>`:
+
+```html
+<html lang="en" data-rmx-preserve-attrs="data-theme"></html>
+```
+
+On frame reloads, the space-separated attribute names in the incoming HTML keep their live values or absence. Other attributes and children reconcile normally. An empty or omitted list uses normal attribute reconciliation. This works on any matched element; it does not prevent removal or replacement. See [Preserving client-owned attributes](https://github.com/remix-run/remix/blob/main/packages/component/docs/frames.md#preserving-client-owned-attributes) for examples and ownership rules.
+
+## Cascade Layers
+
+The component runtime emits generated `css(...)` rules under the `rmx` cascade layer. Unlayered CSS outranks layered CSS, so use explicit layer order when mixing generated styles with global styles.
+
+Put layers that should lose to generated styles before `rmx`:
+
+```css
+@layer base, rmx;
+
+@layer base {
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+    margin: 0;
+    padding: 0;
+  }
+}
+```
+
+## License
 
 See [LICENSE](https://github.com/remix-run/remix/blob/main/LICENSE)

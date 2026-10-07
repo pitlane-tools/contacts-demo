@@ -21,8 +21,8 @@ importers:
         specifier: ^8.2.0
         version: 8.3.0
       pitlane:
-        specifier: https://pkg.pr.new/pitlane-tools/pitlane/pitlane@9b92b15c84093ef29f578dd91429ab41a5ee05e3
-        version: https://pkg.pr.new/pitlane-tools/pitlane/pitlane@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
+        specifier: ^1.0.0-alpha.2
+        version: 1.0.0-alpha.2(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
       remix:
         specifier: 3.0.0
         version: 3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)
@@ -1927,9 +1927,8 @@ packages:
     resolution: {integrity: sha512-S0uyoxakDINJ4DPgqxGlEEvrdSMeQb7Z2lKVjxoY2gwsbZbfg2Xr8Klfeo5ZeraHmmdBCELFUHkSe6KEmBpMvg==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  '@pitlane/assets@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@9b92b15c84093ef29f578dd91429ab41a5ee05e3':
-    resolution: {integrity: sha512-PbmdUgCcTOLBLl2JuO0n7ylptsai739Dm5OSiywQraGzhUWrNMh2kkjz3Yi0jUXSt/aKUeHdu0FvW8TzWbc3UA==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
-    version: 0.0.0
+  '@pitlane/assets@0.1.0':
+    resolution: {integrity: sha512-4eXUkhK6eSLLH+LmcWB+GoAMy1AOeb+I1YhtpDrsDIerEH+FI93Yfkj2gQBdawNxpsLAOK/1BH7OhIOab1hLuA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       vite: '>=8.1.0'
@@ -1937,9 +1936,8 @@ packages:
       vite:
         optional: true
 
-  '@pitlane/content@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/content@9b92b15c84093ef29f578dd91429ab41a5ee05e3':
-    resolution: {integrity: sha512-0u5UUkzG/e+XX1IruvJvzOkI84x1Q5viLoD0Iiw1uoxnNHxT+7IInmopRbH1eOj0QxdxXPIrxkl94pDAxF/xtA==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/content@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
-    version: 0.3.1
+  '@pitlane/content@0.4.0':
+    resolution: {integrity: sha512-/pKanAMFox9TRPkblHTB6qd+7jSlwiDRcf6bo7vxVeI+jyzAA2sFYPNtVqtb5cRjCQgLoU5TN86AmegRgZfiQw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       remix: ^3.0.0
@@ -1953,37 +1951,32 @@ packages:
       vite:
         optional: true
 
-  '@pitlane/crawler@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/crawler@9b92b15c84093ef29f578dd91429ab41a5ee05e3':
-    resolution: {integrity: sha512-zYE36VMcHGAdzLhJ4lL12vJs9nJLEekDOUVmtoW+2e2zI1LjNXY83ewy+f1zrZoq8tCL1hvIjTa7TbnvYcI+qw==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/crawler@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
-    version: 0.3.0
+  '@pitlane/crawler@0.3.0':
+    resolution: {integrity: sha512-dDrNjGmbvEEXfdi9H0+Ki4SSpFEr5oG1/uUntoVUeiQXOO2ooNmzeFDQCi6uc/RHWvvCwjIJ96mMAaLHsoVZyQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       remix: ^3.0.0
 
-  '@pitlane/data-table-d1@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/data-table-d1@9b92b15c84093ef29f578dd91429ab41a5ee05e3':
-    resolution: {integrity: sha512-ZwKlLceDr17VlBD4qvK9wz6KJ0dGAUaUtM6SapJs7PoVE8cf0FunEeRXUW8JWeK69f69uwYAuyNz1WnN0VG/Dg==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/data-table-d1@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
-    version: 0.3.0
+  '@pitlane/data-table-d1@0.3.0':
+    resolution: {integrity: sha512-Fjl0z+ZW8OBK1wiFSwT9h3yMhgqd7axq2cyDLTBH75fCRyFH9Mx7FKXHZ+P802U+piq14jyKIU8vNTJk3EotkQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       remix: ^3.0.0
 
-  '@pitlane/theme@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/theme@9b92b15c84093ef29f578dd91429ab41a5ee05e3':
-    resolution: {integrity: sha512-yQoLZlK8OUBFo6o9rVx1WrUDqFeR5XynTzV4XqmTVNBrUVkr6/OJr8n1gl3PhmlSgSV14M1Ozl6HwPAzIeY+2Q==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/theme@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
-    version: 0.5.0
+  '@pitlane/theme@0.5.0':
+    resolution: {integrity: sha512-zRVoo8VvDL3QI8yHI3ovfd2mcrybf/oTsACJ4PnJoD3EVim+wU+a00b8/IgvQtQz7v+M7bzgtRhFIjImRkPLjA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       remix: ^3.0.0
 
-  '@pitlane/vite-plugin-fetch-server@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-fetch-server@9b92b15c84093ef29f578dd91429ab41a5ee05e3':
-    resolution: {integrity: sha512-qqqNSlpyLcuTrECU0wDJ7V+TlYatFV1SeYnXgc0CE+b/+dORmTGEUxgIc3MoJwgGXnr0S/Q1Tx1bgYytdihPFw==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-fetch-server@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
-    version: 0.0.0
+  '@pitlane/vite-plugin-fetch-server@0.1.0':
+    resolution: {integrity: sha512-NckJEBc1ECO45ddDSJc12LIPsbuKd1629hA/x3egppG4rKiU7TdfDhnIWw2bDi+36DYMeo8UFGBBEe7THY6o6Q==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       vite: '>=8.1.0'
 
-  '@pitlane/vite-plugin-remix@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-remix@9b92b15c84093ef29f578dd91429ab41a5ee05e3':
-    resolution: {integrity: sha512-aFJFpIargQyga/7FfBGfchiyhyNlzuTBT1vIoEtEfX7yLyvfsUd0Cs9owuXAGqrr+Uqr+LnZ6k2jcRV5Yypw7g==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-remix@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
-    version: 0.7.1
+  '@pitlane/vite-plugin-remix@0.8.0':
+    resolution: {integrity: sha512-xblDN9btIaPAb7JdrUfW4YzqIUQ37raE7vQWzcx5NuTqWLJgBTAlpU3wud4XrCWBRMb6m5Cq/sn5BK0Jx1+33w==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       remix: ^3.0.0
@@ -3375,9 +3368,8 @@ packages:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
 
-  pitlane@https://pkg.pr.new/pitlane-tools/pitlane/pitlane@9b92b15c84093ef29f578dd91429ab41a5ee05e3:
-    resolution: {integrity: sha512-zVB7kdwxzuR/Qcc9n+BK2BMQwszmgTWx2Y4GdJTkPdrifDyfd/m+Vr/5BSMwVGfgX29x/UUS5kxyzUyD8T0RVg==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/pitlane@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
-    version: 1.0.0-alpha.1
+  pitlane@1.0.0-alpha.2:
+    resolution: {integrity: sha512-vqwEJZL/v7A1eNQyqqI77nRIvKlNU3XTYxO5W6Yul20pPBLVPurPtDODYj7ooTApXc9+pGZsIyTQqZoF6b3QZg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       remix: ^3.0.0
@@ -4969,13 +4961,13 @@ snapshots:
 
   '@oxlint/plugins@1.79.0': {}
 
-  '@pitlane/assets@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))':
+  '@pitlane/assets@0.1.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))':
     dependencies:
       magic-string: 0.30.21
     optionalDependencies:
       vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
 
-  '@pitlane/content@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/content@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
+  '@pitlane/content@0.4.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
     dependencies:
       es-module-lexer: 2.3.2
       yaml: 2.9.1
@@ -4983,29 +4975,29 @@ snapshots:
       remix: 3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)
       vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
 
-  '@pitlane/crawler@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/crawler@9b92b15c84093ef29f578dd91429ab41a5ee05e3(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
+  '@pitlane/crawler@0.3.0(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
     dependencies:
       remix: 3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)
 
-  '@pitlane/data-table-d1@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/data-table-d1@9b92b15c84093ef29f578dd91429ab41a5ee05e3(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
+  '@pitlane/data-table-d1@0.3.0(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
     dependencies:
       remix: 3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)
 
-  '@pitlane/theme@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/theme@9b92b15c84093ef29f578dd91429ab41a5ee05e3(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
+  '@pitlane/theme@0.5.0(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
     dependencies:
       csstype: 3.2.3
       remix: 3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)
 
-  '@pitlane/vite-plugin-fetch-server@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-fetch-server@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))':
+  '@pitlane/vite-plugin-fetch-server@0.1.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))':
     dependencies:
       '@remix-run/node-fetch-server': 1.0.0
       vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
 
-  '@pitlane/vite-plugin-remix@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-remix@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
+  '@pitlane/vite-plugin-remix@0.8.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
     dependencies:
-      '@pitlane/assets': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
-      '@pitlane/crawler': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/crawler@9b92b15c84093ef29f578dd91429ab41a5ee05e3(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
-      '@pitlane/vite-plugin-fetch-server': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-fetch-server@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
+      '@pitlane/assets': 0.1.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
+      '@pitlane/crawler': 0.3.0(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
+      '@pitlane/vite-plugin-fetch-server': 0.1.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
       magic-string: 0.30.21
       remix: 3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)
       vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
@@ -6486,15 +6478,15 @@ snapshots:
 
   picomatch@4.0.7: {}
 
-  pitlane@https://pkg.pr.new/pitlane-tools/pitlane/pitlane@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)):
+  pitlane@1.0.0-alpha.2(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)):
     dependencies:
-      '@pitlane/assets': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
-      '@pitlane/content': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/content@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
-      '@pitlane/crawler': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/crawler@9b92b15c84093ef29f578dd91429ab41a5ee05e3(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
-      '@pitlane/data-table-d1': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/data-table-d1@9b92b15c84093ef29f578dd91429ab41a5ee05e3(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
-      '@pitlane/theme': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/theme@9b92b15c84093ef29f578dd91429ab41a5ee05e3(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
-      '@pitlane/vite-plugin-fetch-server': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-fetch-server@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
-      '@pitlane/vite-plugin-remix': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-remix@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
+      '@pitlane/assets': 0.1.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
+      '@pitlane/content': 0.4.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
+      '@pitlane/crawler': 0.3.0(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
+      '@pitlane/data-table-d1': 0.3.0(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
+      '@pitlane/theme': 0.5.0(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
+      '@pitlane/vite-plugin-fetch-server': 0.1.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
+      '@pitlane/vite-plugin-remix': 0.8.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
       remix: 3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)
       vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
 

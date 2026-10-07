@@ -9,7 +9,7 @@
         "@std/jsonc": "jsr:^1.0.2",
         "es-toolkit": "^1.45.1",
         "match-sorter": "^8.2.0",
-        "pitlane": "https://pkg.pr.new/pitlane-tools/pitlane/pitlane@9b92b15c84093ef29f578dd91429ab41a5ee05e3",
+        "pitlane": "^1.0.0-alpha.2",
         "remix": "3.0.0"
     },
     "devDependencies": {

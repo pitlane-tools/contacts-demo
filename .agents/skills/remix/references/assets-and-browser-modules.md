@@ -27,8 +27,9 @@ preloads, sourcemaps, or fingerprinted URLs.
 ## Default Pattern
 
 ```typescript
-import { createAssetServer } from "remix/assets";
 import type { Controller } from "remix/router";
+
+import { createAssetServer } from "remix/assets";
 
 import type { routes } from "../routes.ts";
 

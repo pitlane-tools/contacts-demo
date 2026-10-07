@@ -1,4 +1,3 @@
-import { UnsupportedMediaTypeError } from "#/utils/uploads.ts";
 import { createD1Database } from "@pitlane/data-table-d1";
 import { env } from "cloudflare:workers";
 import { Database } from "remix/data-table";
@@ -11,6 +10,8 @@ import {
     MultipartParseError,
 } from "remix/multipart-parser";
 import { type Middleware } from "remix/router";
+
+import { UnsupportedMediaTypeError } from "#/utils/uploads.ts";
 
 type DatabaseEntry = { key: typeof Database; value: Database };
 

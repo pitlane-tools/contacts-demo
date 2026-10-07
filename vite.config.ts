@@ -47,7 +47,7 @@ export default defineConfig({
                 cache: false,
             },
             typegen: {
-                input: ["wrangler.jsonc"],
+                cache: { input: ["wrangler.jsonc"] },
                 command: "wrangler types",
             },
             typecheck: {

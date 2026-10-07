@@ -1,6 +1,11 @@
-import type { PageMetadata } from "#/utils/page-metadata.ts";
 import type { RemixNode } from "remix/component";
 import type { RenderFunction } from "remix/middleware/render";
+
+import * as s from "remix/data-schema";
+import { redirect } from "remix/response/redirect";
+import { createController } from "remix/router";
+
+import type { PageMetadata } from "#/utils/page-metadata.ts";
 
 import { EditContact } from "#/actions/contacts/form.tsx";
 import { ContactNotFound } from "#/actions/contacts/not-found-page.tsx";
@@ -20,9 +25,6 @@ import { routes } from "#/routes.ts";
 import { Document } from "#/ui/document.tsx";
 import { frameTarget } from "#/utils/frames.ts";
 import { pageMetadataHeaders } from "#/utils/page-metadata.ts";
-import * as s from "remix/data-schema";
-import { redirect } from "remix/response/redirect";
-import { createController } from "remix/router";
 
 /** A contact's detail-frame content plus the page metadata that describes it. */
 type DetailPage = PageMetadata & { node: RemixNode };

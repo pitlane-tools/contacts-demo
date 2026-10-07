@@ -278,9 +278,7 @@ middleware:
 ```typescript
 export default {
     middleware: [requireAuth(), requireAdmin()],
-    actions: {
-        /* all actions require auth + admin */
-    },
+    actions: {/* all actions require auth + admin */},
 } satisfies Controller<typeof routes.admin, AppContext>;
 ```
 

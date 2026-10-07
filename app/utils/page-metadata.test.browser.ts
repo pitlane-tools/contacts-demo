@@ -1,5 +1,6 @@
-import { applyPageMetadata, pageMetadataHeaders } from "#/utils/page-metadata.ts";
 import { describe, expect, it } from "vitest";
+
+import { applyPageMetadata, pageMetadataHeaders } from "#/utils/page-metadata.ts";
 
 function apply(metadata: Parameters<typeof pageMetadataHeaders>[0]): void {
     applyPageMetadata(new Headers(pageMetadataHeaders(metadata)));

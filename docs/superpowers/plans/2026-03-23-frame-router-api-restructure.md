@@ -131,7 +131,9 @@ Replace `generateNestedAPI` (called twice) with `generateFrameNodes` (called onc
 
 import type { Handle } from "remix/component";
 import type { Route } from "remix/fetch-router/routes";
+
 import { TrieMatcher } from "remix/route-pattern";
+
 import type { ExtractRouteParams, FrameRouter, RouteResolver, RouteTuple } from "./types.ts";
 
 /**

@@ -81,11 +81,13 @@ export const routes = createRoutes({
 Add `documentWithSidebar()` and `isDetailFrameRequest()` helpers here (not in `router.tsx`) to avoid circular imports — `router.tsx` imports `contacts.tsx`, so `contacts.tsx` cannot import back from `router.tsx`.
 
 ```tsx
-import { getContext } from "remix/async-context-middleware";
 import type { RemixNode } from "remix/component";
+
+import { matchSorter } from "match-sorter";
+import { getContext } from "remix/async-context-middleware";
 import { renderToStream } from "remix/component/server";
 import { createHtmlResponse as html } from "remix/response/html";
-import { matchSorter } from "match-sorter";
+
 import { Document } from "~/components/Document.tsx";
 import { getContacts } from "~/lib/database/contacts.ts";
 import { router } from "~/router.tsx";
@@ -147,11 +149,13 @@ import { createRouter } from "remix/fetch-router";
 import { formData } from "remix/form-data-middleware";
 import { methodOverride } from "remix/method-override-middleware";
 import { staticFiles } from "remix/static-middleware";
+
 import { ZeroState } from "~/components/ZeroState.tsx";
+
 import { loadDatabase } from "./lib/database/middleware.ts";
 import { documentWithSidebar, isDetailFrameRequest, render } from "./lib/render.tsx";
-import contacts from "./routes/contacts.tsx";
 import { routes } from "./routes.ts";
+import contacts from "./routes/contacts.tsx";
 
 export const router = createRouter({
     middleware: [
@@ -181,9 +185,11 @@ router.map(routes.contacts, contacts);
 Each GET action checks `isDetailFrameRequest()` and returns either the detail fragment or the full document. POST actions do their mutation and redirect as before.
 
 ```tsx
-import type { Controller } from "remix/fetch-router";
 import type { RemixNode } from "remix/component";
+import type { Controller } from "remix/fetch-router";
+
 import { redirect } from "remix/response/redirect";
+
 import { EditContact } from "~/components/EditContact.tsx";
 import { ShowContact } from "~/components/ShowContact.tsx";
 import { ZeroState } from "~/components/ZeroState.tsx";
@@ -276,10 +282,12 @@ The `Sidebar` component is inlined directly into `Document` since it's now just 
 ```tsx
 import { getContext } from "remix/async-context-middleware";
 import { Frame } from "remix/component";
-import { NewButton } from "~/assets/Buttons.tsx";
-import { SidebarItem } from "~/assets/SidebarItem.tsx";
-import { SearchBar } from "~/assets/SearchBar.tsx";
+
 import type { Contact } from "~/lib/database/contacts.ts";
+
+import { NewButton } from "~/assets/Buttons.tsx";
+import { SearchBar } from "~/assets/SearchBar.tsx";
+import { SidebarItem } from "~/assets/SidebarItem.tsx";
 
 export function Document() {
     const { url } = getContext();
@@ -388,6 +396,7 @@ import {
     type SerializableProps,
 } from "remix/component";
 import { TrieMatcher } from "remix/route-pattern";
+
 import { navigating } from "~/lib/navigation.ts";
 import { routes } from "~/routes.ts";
 
@@ -460,6 +469,7 @@ Note: Remix's `navigate()` options use `"push" | "replace"` (no `"auto"`), so th
 
 ```tsx
 import { addEventListeners, clientEntry, type Handle, navigate, on } from "remix/component";
+
 import { navigating } from "~/lib/navigation.ts";
 import { routes } from "~/routes.ts";
 
@@ -528,6 +538,7 @@ Contains `NewButton`, `EditButton`, `CancelButton`, and `DeleteButton`. Each exp
 
 ```tsx
 import { clientEntry, navigate, on } from "remix/component";
+
 import { routes } from "~/routes.ts";
 
 export const NewButton = clientEntry(
@@ -616,6 +627,7 @@ Stays in its own file. Replace `navigation.reload()` with Remix `navigate()`:
 
 ```tsx
 import { clientEntry, type Handle, navigate, on } from "remix/component";
+
 import { routes } from "~/routes.ts";
 
 export const Favorite = clientEntry(

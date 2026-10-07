@@ -151,9 +151,9 @@ bypassable by clearing cookies; if the guarantee needs to survive that, you also
 ### Basic setup
 
 ```typescript
+import { Database } from "remix/data-table";
 import { auth, createSessionAuthScheme } from "remix/middleware/auth";
 import { Session } from "remix/session";
-import { Database } from "remix/data-table";
 
 export function loadAuth() {
     return auth({
@@ -246,8 +246,8 @@ async action(context) {
 ### Logout action
 
 ```typescript
-import { Session } from "remix/session";
 import { redirect } from "remix/response/redirect";
+import { Session } from "remix/session";
 
 function logout(context) {
     let session = context.get(Session);
@@ -292,8 +292,9 @@ with `createOAuthProvider()` and the `OAuthProviderRuntime` contract, then feed 
 `startExternalAuth()` / `finishExternalAuth()` / `refreshExternalAuth()` helpers:
 
 ```typescript
-import { createOAuthProvider } from "remix/auth";
 import type { OAuthTokens } from "remix/auth";
+
+import { createOAuthProvider } from "remix/auth";
 
 let acmeProvider = createOAuthProvider<AcmeProfile, "acme", AcmeTokens>("acme", {
     // createAuthorizationURL(), handleCallback(), and an optional refresh hook

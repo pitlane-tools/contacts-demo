@@ -1,5 +1,10 @@
 import type { Handle } from "remix/component";
 
+import { mergeAssets } from "@pitlane/dev/runtime";
+import { HMR } from "pitlane:dev";
+import { Frame } from "remix/component";
+import { getContext } from "remix/middleware/async-context";
+
 import { SITE } from "#/data/meta.ts";
 import { searchQuery } from "#/data/schemas.ts";
 import clientAssets from "#/entry.browser.tsx?assets=client";
@@ -7,10 +12,6 @@ import serverAssets from "#/entry.server.tsx?assets=ssr";
 import styles from "#/index.css?url";
 import { routes } from "#/routes.ts";
 import { SearchBar } from "#/ui/search-bar.tsx";
-import { mergeAssets } from "@pitlane/dev/runtime";
-import { HMR } from "pitlane:dev";
-import { Frame } from "remix/component";
-import { getContext } from "remix/middleware/async-context";
 
 import { RestfulForm } from "./restful-form.tsx";
 

@@ -292,8 +292,8 @@ This is **not** how ordinary POSTs work anymore — it is the optimism escape ha
 **Method override for PUT/PATCH/DELETE:** HTML forms only support GET and POST. For other HTTP methods, use a hidden `_method` field with the `methodOverride()` middleware. `app/ui/restful-form.tsx` wraps the pattern so no form repeats the boilerplate:
 
 ```tsx
-import type { RequestMethod } from "remix/router";
 import type { Handle } from "remix/component";
+import type { RequestMethod } from "remix/router";
 
 export function RestfulForm(
     handle: Handle<JSX.IntrinsicHTMLElements["form"] & { method?: RequestMethod | "ANY" }>,
@@ -711,16 +711,17 @@ router.map(routes.posts, postsController); // Maps all sub-routes to a controlle
 **Recommended middleware stack** (`app/entry.server.tsx`):
 
 ```tsx
-import contacts from "#/actions/contacts/controller.tsx";
-import controller from "#/actions/controller.tsx";
-import { database, uploadErrors } from "#/middleware.ts";
-import { routes } from "#/routes.ts";
-import { UPLOAD_LIMITS, uploadHandler } from "#/utils/uploads.ts";
 import { asyncContext } from "remix/middleware/async-context";
 import { formData } from "remix/middleware/form-data";
 import { methodOverride } from "remix/middleware/method-override";
 import { render } from "remix/middleware/render";
 import { createRouter, type MiddlewareContext } from "remix/router";
+
+import contacts from "#/actions/contacts/controller.tsx";
+import controller from "#/actions/controller.tsx";
+import { database, uploadErrors } from "#/middleware.ts";
+import { routes } from "#/routes.ts";
+import { UPLOAD_LIMITS, uploadHandler } from "#/utils/uploads.ts";
 
 let middleware = [
     uploadErrors(),
@@ -828,6 +829,7 @@ A few of those rows deserve their reasoning spelled out, because the obvious alt
 
 ```tsx
 import { createController } from "remix/router";
+
 import { routes } from "#/routes.ts";
 
 export default createController(routes.posts, {
@@ -1018,8 +1020,9 @@ No component in this app currently _listens_ for these events — search owns it
 ```tsx
 import type { Handle } from "remix/component";
 
-import { applyPageMetadata } from "#/utils/page-metadata.ts";
 import { createRoot, on, run } from "remix/component";
+
+import { applyPageMetadata } from "#/utils/page-metadata.ts";
 
 let app = run({
     async loadModule(moduleUrl, exportName) {
@@ -1602,9 +1605,10 @@ The helper copies each `up.sql` **verbatim** rather than splitting it into state
 
 ```tsx
 // db/seed.ts
-import { Posts } from "#/data/posts.ts";
 import { createD1Database } from "@pitlane/data-table-d1";
 import { getPlatformProxy } from "wrangler";
+
+import { Posts } from "#/data/posts.ts";
 
 let proxy = await getPlatformProxy<Env>({ configPath: "./wrangler.jsonc", persist: true });
 
@@ -1715,6 +1719,7 @@ The apply helper is a thin wrapper around `wrangler`:
 ```tsx
 // db/apply-d1-migrations.ts (simplified)
 import { parseArgs } from "node:util";
+
 import { buildApplyCommand, runApplyCommand } from "./lib/wrangler-cli.ts";
 import { parseWranglerConfig } from "./lib/wrangler-config.ts";
 
@@ -1873,10 +1878,9 @@ The client handles the state update optimistically and doesn't need a redirect.
 
 ```tsx
 import { cloudflare } from "@cloudflare/vite-plugin";
+import { remix } from "@pitlane/dev";
 import devtoolsJson from "vite-plugin-devtools-json";
 import { defineConfig } from "vite-plus";
-
-import { remix } from "@pitlane/dev";
 
 export default defineConfig({
     plugins: [
@@ -1937,12 +1941,8 @@ export default defineConfig({
             deploy: { command: "wrangler deploy", cache: false },
         },
     },
-    fmt: {
-        /* Oxfmt options */
-    },
-    lint: {
-        /* Oxlint options */
-    },
+    fmt: {/* Oxfmt options */},
+    lint: {/* Oxlint options */},
 });
 ```
 
@@ -1988,10 +1988,11 @@ export default defineConfig({
 `app/actions/contacts/sidebar-item.tsx`, in full:
 
 ```tsx
+import { clientEntry, type Handle, type SerializableProps } from "remix/component";
+import { createMultiMatcher } from "remix/route-pattern/match";
+
 import { routes } from "#/routes.ts";
 import { isServer, onDestinationChange, pendingDestination } from "#/utils/pending-navigation.ts";
-import { createMultiMatcher } from "remix/route-pattern/match";
-import { clientEntry, type Handle, type SerializableProps } from "remix/component";
 
 let matcher = createMultiMatcher<true>();
 matcher.add(routes.contacts.show.pattern, true);
@@ -2295,6 +2296,7 @@ import styles from "#/index.css?url";
 
 ```tsx
 import { mergeAssets } from "@pitlane/dev/runtime";
+
 import clientAssets from "#/entry.browser.tsx?assets=client";
 import serverAssets from "#/entry.server.tsx?assets=ssr";
 import styles from "#/index.css?url";
@@ -2951,8 +2953,8 @@ This runs the whole stack — middleware, method override, router, controller, r
 **Component test** — `render()` from `remix/component/test` works unchanged under jsdom:
 
 ```tsx
-import { describe, expect, it, onTestFinished } from "vitest";
 import { render } from "remix/component/test";
+import { describe, expect, it, onTestFinished } from "vitest";
 
 describe("FavoriteButton", () => {
     it("shows the current state but submits the desired one", () => {
@@ -2990,8 +2992,8 @@ describe("FavoriteButton", () => {
 
 ```tsx
 import { createCookie } from "remix/cookie";
-import { Session } from "remix/session";
 import { session } from "remix/middleware/session";
+import { Session } from "remix/session";
 import { createCookieSessionStorage } from "remix/session-storage/cookie";
 
 // 1. Create a signed cookie (secrets are required)
@@ -3117,8 +3119,8 @@ session.destroy(); // Clears all data, clears client cookie on next response
 
 ```tsx
 import { auth, createSessionAuthScheme, requireAuth } from "remix/middleware/auth";
-import { Session } from "remix/session";
 import { session } from "remix/middleware/session";
+import { Session } from "remix/session";
 
 let router = createRouter({
     middleware: [
@@ -3228,8 +3230,9 @@ The logout form is also a plain `<form method="POST">` — no JavaScript require
 **Protecting routes:**
 
 ```tsx
-import { Auth, requireAuth } from "remix/middleware/auth";
 import type { GoodAuth } from "remix/middleware/auth";
+
+import { Auth, requireAuth } from "remix/middleware/auth";
 
 router.map(routes.dashboard, {
     middleware: [requireAuth()],
@@ -3307,9 +3310,7 @@ import { createBearerTokenAuthScheme, createSessionAuthScheme } from "remix/midd
 
 auth({
     schemes: [
-        createSessionAuthScheme({
-            /* ... */
-        }),
+        createSessionAuthScheme({/* ... */}),
         createBearerTokenAuthScheme({
             async verify(token) {
                 return apiKeys.validate(token);
@@ -3332,9 +3333,10 @@ auth({
 ```tsx
 import type { FileUpload } from "remix/form-data-parser";
 
+import { env } from "cloudflare:workers";
+
 import { R2FileStorage } from "#/data/adapters/r2-file-storage.ts";
 import { routes } from "#/routes.ts";
-import { env } from "cloudflare:workers";
 
 const ALLOWED_TYPE: Record<string, true> = {
     "image/avif": true,

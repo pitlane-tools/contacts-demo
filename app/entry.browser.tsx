@@ -1,7 +1,8 @@
 import type { Handle } from "remix/component";
 
-import { applyPageMetadata } from "#/utils/page-metadata.ts";
 import { createRoot, on, run } from "remix/component";
+
+import { applyPageMetadata } from "#/utils/page-metadata.ts";
 
 let app = run({
     async loadModule(moduleUrl, exportName) {

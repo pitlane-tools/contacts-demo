@@ -1,6 +1,6 @@
 import type { Handle } from "remix/component";
 
-import { revalidate } from "@pitlane/vite-plugin-remix/hmr";
+import { revalidate } from "pitlane/vite-plugin-remix/hmr";
 import { createRoot, on, run } from "remix/component";
 
 import { applyPageMetadata } from "#/utils/page-metadata.ts";

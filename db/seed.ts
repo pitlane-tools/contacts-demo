@@ -1,4 +1,4 @@
-import { createD1Database } from "@pitlane/data-table-d1";
+import { createD1Database } from "pitlane/data-table-d1";
 import { getPlatformProxy } from "wrangler";
 
 import { Contacts } from "#/data/contacts.ts";

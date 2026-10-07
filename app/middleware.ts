@@ -1,5 +1,5 @@
-import { createD1Database } from "@pitlane/data-table-d1";
 import { env } from "cloudflare:workers";
+import { createD1Database } from "pitlane/data-table-d1";
 import { Database } from "remix/data-table";
 import { FormDataParseError, MaxFilesExceededError } from "remix/form-data-parser";
 import {

@@ -1192,8 +1192,8 @@ import { Database } from "remix/data-table";
 **Set it in middleware** (`app/middleware.ts`):
 
 ```tsx
-import { createD1Database } from "@pitlane/data-table-d1";
 import { env } from "cloudflare:workers";
+import { createD1Database } from "pitlane/data-table-d1";
 import { Database } from "remix/data-table";
 import { type Middleware } from "remix/router";
 
@@ -1578,12 +1578,12 @@ drop table if exists "posts";
 >
 > Per-migration transaction behavior is set with a directive on the first non-blank line of `up.sql`: `-- data-table/transaction: none` (modes: `auto` default, `required`, `none`).
 
-**Compiling to SQL** — `generateD1Migrations` from `@pitlane/data-table-d1/migrations` reads each migration's `up.sql` and writes one Wrangler-shaped `.sql` file per migration, then deletes generated files with no migration behind them so the output directory is a pure function of the input one:
+**Compiling to SQL** — `generateD1Migrations` from `pitlane/data-table-d1/migrations` reads each migration's `up.sql` and writes one Wrangler-shaped `.sql` file per migration, then deletes generated files with no migration behind them so the output directory is a pure function of the input one:
 
 ```tsx
 // db/generate-d1-migrations.ts
-import { generateD1Migrations } from "@pitlane/data-table-d1/migrations";
 import path from "node:path";
+import { generateD1Migrations } from "pitlane/data-table-d1/migrations";
 
 import { parseWranglerConfig } from "./lib/wrangler-config.ts";
 
@@ -1606,7 +1606,7 @@ The helper copies each `up.sql` **verbatim** rather than splitting it into state
 
 ```tsx
 // db/seed.ts
-import { createD1Database } from "@pitlane/data-table-d1";
+import { createD1Database } from "pitlane/data-table-d1";
 import { getPlatformProxy } from "wrangler";
 
 import { Posts } from "#/data/posts.ts";
@@ -1879,7 +1879,7 @@ The client handles the state update optimistically and doesn't need a redirect.
 
 ```tsx
 import { cloudflare } from "@cloudflare/vite-plugin";
-import { remix } from "@pitlane/vite-plugin-remix";
+import { remix } from "pitlane/vite-plugin-remix";
 import devtoolsJson from "vite-plugin-devtools-json";
 import { defineConfig } from "vite-plus";
 
@@ -1965,7 +1965,7 @@ export default defineConfig({
 - **Build orchestration:** Builds SSR then client environments, with separate output directories (`dist/ssr`, `dist/client`)
 - **Preview server:** Loads the built SSR entry and creates a request listener for `vp preview`
 - **Client entry transforms:** Rewrites `import.meta.url` in `clientEntry()` calls to a portable `file:app/…#ExportName` entry ID that `render({ assets })` resolves
-- **Asset manifest:** Composes `assets()` from `@pitlane/assets/vite-plugin`, which supplies `@pitlane/assets/manifest` and turns on Vite's chunk import map for the client build
+- **Asset manifest:** Composes `assets()` from `pitlane/assets/vite-plugin`, which supplies `pitlane/assets/manifest` and turns on Vite's chunk import map for the client build
 - **Error suppression:** Prevents abort errors from cancelled requests (e.g., search-as-you-type) from triggering the Vite error overlay
 
 **Commands:**
@@ -2284,8 +2284,8 @@ async resolveFrame(src, options) {
 **The resolver** (`app/assets.ts`):
 
 ```ts
-import { createAssetResolver } from "@pitlane/assets";
-import manifest from "@pitlane/assets/manifest";
+import { createAssetResolver } from "pitlane/assets";
+import manifest from "pitlane/assets/manifest";
 
 export let assets = createAssetResolver(manifest);
 
@@ -2915,7 +2915,7 @@ export default defineConfig({
 
 Four details that are easy to get wrong:
 
-- **The app's Vite plugins belong in both projects.** `@pitlane/vite-plugin-remix`'s `remix()` provides the `clientEntry()` transform and `@pitlane/assets/manifest`. Without it the module graph will not even import.
+- **The app's Vite plugins belong in both projects.** `@pitlane/vite-plugin-remix`'s `remix()` provides the `clientEntry()` transform and `pitlane/assets/manifest`. Without it the module graph will not even import.
 - **Component HMR must be filtered out of the `dom` project.** It rewrites modules to talk to a dev-server registry no test runtime provides, and fails with `Cannot read properties of undefined (reading 'componentNamesByModuleUrl')`. It is a `vite dev` concern.
 - **D1 needs its schema as data.** Workerd has no filesystem, so `readD1Migrations()` reads the generated SQL in Node at config time and a setup file applies it with `applyD1Migrations()`. `vp run test` depends on `db:migrations:generate` so the two cannot drift.
 - **Set `NODE_ENV=test` as a binding.** `fakeNetwork()` sleeps 1–3s per uncached call unless it sees it, and workerd does not set it. Worth 9.1s → 1.6s on this suite.
@@ -3651,8 +3651,8 @@ let db = env.DB;
 let bucket = env.FILES;
 
 // In middleware (preferred — inject into request context)
-import { createD1Database } from "@pitlane/data-table-d1";
 import { env } from "cloudflare:workers";
+import { createD1Database } from "pitlane/data-table-d1";
 import { Database } from "remix/data-table";
 import { type Middleware } from "remix/router";
 
@@ -3682,14 +3682,14 @@ export function database(): Middleware<DatabaseEntry> {
 Don't hand-write an adapter. `@pitlane/data-table-d1` supplies `createD1Database(binding, options?)`, which returns a `D1Database extends Database<"sqlite">` — every query, persistence, and migration method comes from `remix/data-table` unchanged:
 
 ```tsx
-import { createD1Database } from "@pitlane/data-table-d1";
 import { env } from "cloudflare:workers";
+import { createD1Database } from "pitlane/data-table-d1";
 
 let db = createD1Database(env.DB);
 let contacts = await db.findMany(Contacts);
 ```
 
-Its Node-only migration half lives behind a separate `@pitlane/data-table-d1/migrations` entry point so nothing from it can reach a Worker bundle — see Recipe 18.
+Its Node-only migration half lives behind a separate `pitlane/data-table-d1/migrations` entry point so nothing from it can reach a Worker bundle — see Recipe 18.
 
 **D1 limitations to know:**
 

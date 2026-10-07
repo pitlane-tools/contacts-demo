@@ -11,12 +11,6 @@ importers:
 
   .:
     dependencies:
-      '@pitlane/assets':
-        specifier: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@730ef15e9de969aebd4629bd7c4aa952500b4dbf
-        version: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@730ef15e9de969aebd4629bd7c4aa952500b4dbf(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))
-      '@pitlane/data-table-d1':
-        specifier: ^0.3.0
-        version: 0.3.0(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
       '@std/jsonc':
         specifier: jsr:^1.0.2
         version: '@jsr/std__jsonc@1.0.2'
@@ -26,19 +20,19 @@ importers:
       match-sorter:
         specifier: ^8.2.0
         version: 8.3.0
+      pitlane:
+        specifier: https://pkg.pr.new/pitlane-tools/pitlane/pitlane@9b92b15c84093ef29f578dd91429ab41a5ee05e3
+        version: https://pkg.pr.new/pitlane-tools/pitlane/pitlane@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
       remix:
         specifier: 3.0.0
         version: 3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.31.0
-        version: 1.35.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(workerd@1.20260430.1)(wrangler@4.87.0)
+        version: 1.35.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(workerd@1.20260430.1)(wrangler@4.87.0)
       '@cloudflare/vitest-plugin':
         specifier: ^1.1.13
         version: 1.1.13(@types/node@25.6.0)(@vitest/runner@4.1.11)(@vitest/snapshot@5.0.3)(vitest@4.1.11)
-      '@pitlane/vite-plugin-remix':
-        specifier: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-remix@730ef15e9de969aebd4629bd7c4aa952500b4dbf
-        version: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-remix@730ef15e9de969aebd4629bd7c4aa952500b4dbf(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
       '@types/node':
         specifier: ^25.5.0
         version: 25.6.0
@@ -59,16 +53,16 @@ importers:
         version: 7.0.1-rc
       vite:
         specifier: npm:@voidzero-dev/vite-plus-core@latest
-        version: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)'
+        version: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
       vite-plugin-devtools-json:
         specifier: ^1.0.0
-        version: 1.0.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))
+        version: 1.0.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
       vite-plus:
         specifier: latest
-        version: 1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc)
+        version: 1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(jsdom@30.1.0)
+        version: 4.1.11(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(jsdom@30.1.0)
       wrangler:
         specifier: ^4.80.0
         version: 4.87.0
@@ -1933,8 +1927,8 @@ packages:
     resolution: {integrity: sha512-S0uyoxakDINJ4DPgqxGlEEvrdSMeQb7Z2lKVjxoY2gwsbZbfg2Xr8Klfeo5ZeraHmmdBCELFUHkSe6KEmBpMvg==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  '@pitlane/assets@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@730ef15e9de969aebd4629bd7c4aa952500b4dbf':
-    resolution: {integrity: sha512-B2Xw03FY1G8SFRl4NAneQVYzCAQq6JgvB9laghdrUZ63zUd7AW6AtokJM5iNdiNMYlloO8zgGHGvH05+tRlJkQ==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@730ef15e9de969aebd4629bd7c4aa952500b4dbf}
+  '@pitlane/assets@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@9b92b15c84093ef29f578dd91429ab41a5ee05e3':
+    resolution: {integrity: sha512-PbmdUgCcTOLBLl2JuO0n7ylptsai739Dm5OSiywQraGzhUWrNMh2kkjz3Yi0jUXSt/aKUeHdu0FvW8TzWbc3UA==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
     version: 0.0.0
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
@@ -1943,28 +1937,52 @@ packages:
       vite:
         optional: true
 
-  '@pitlane/crawler@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/crawler@730ef15e9de969aebd4629bd7c4aa952500b4dbf':
-    resolution: {integrity: sha512-zYE36VMcHGAdzLhJ4lL12vJs9nJLEekDOUVmtoW+2e2zI1LjNXY83ewy+f1zrZoq8tCL1hvIjTa7TbnvYcI+qw==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/crawler@730ef15e9de969aebd4629bd7c4aa952500b4dbf}
+  '@pitlane/content@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/content@9b92b15c84093ef29f578dd91429ab41a5ee05e3':
+    resolution: {integrity: sha512-0u5UUkzG/e+XX1IruvJvzOkI84x1Q5viLoD0Iiw1uoxnNHxT+7IInmopRbH1eOj0QxdxXPIrxkl94pDAxF/xtA==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/content@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
+    version: 0.3.1
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      remix: ^3.0.0
+      satteri: ^0.10.5
+      vite: '>=8.0.0'
+    peerDependenciesMeta:
+      remix:
+        optional: true
+      satteri:
+        optional: true
+      vite:
+        optional: true
+
+  '@pitlane/crawler@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/crawler@9b92b15c84093ef29f578dd91429ab41a5ee05e3':
+    resolution: {integrity: sha512-zYE36VMcHGAdzLhJ4lL12vJs9nJLEekDOUVmtoW+2e2zI1LjNXY83ewy+f1zrZoq8tCL1hvIjTa7TbnvYcI+qw==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/crawler@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
     version: 0.3.0
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       remix: ^3.0.0
 
-  '@pitlane/data-table-d1@0.3.0':
-    resolution: {integrity: sha512-Fjl0z+ZW8OBK1wiFSwT9h3yMhgqd7axq2cyDLTBH75fCRyFH9Mx7FKXHZ+P802U+piq14jyKIU8vNTJk3EotkQ==}
+  '@pitlane/data-table-d1@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/data-table-d1@9b92b15c84093ef29f578dd91429ab41a5ee05e3':
+    resolution: {integrity: sha512-ZwKlLceDr17VlBD4qvK9wz6KJ0dGAUaUtM6SapJs7PoVE8cf0FunEeRXUW8JWeK69f69uwYAuyNz1WnN0VG/Dg==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/data-table-d1@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
+    version: 0.3.0
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       remix: ^3.0.0
 
-  '@pitlane/vite-plugin-fetch-server@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-fetch-server@730ef15e9de969aebd4629bd7c4aa952500b4dbf':
-    resolution: {integrity: sha512-qqqNSlpyLcuTrECU0wDJ7V+TlYatFV1SeYnXgc0CE+b/+dORmTGEUxgIc3MoJwgGXnr0S/Q1Tx1bgYytdihPFw==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-fetch-server@730ef15e9de969aebd4629bd7c4aa952500b4dbf}
+  '@pitlane/theme@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/theme@9b92b15c84093ef29f578dd91429ab41a5ee05e3':
+    resolution: {integrity: sha512-yQoLZlK8OUBFo6o9rVx1WrUDqFeR5XynTzV4XqmTVNBrUVkr6/OJr8n1gl3PhmlSgSV14M1Ozl6HwPAzIeY+2Q==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/theme@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
+    version: 0.5.0
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      remix: ^3.0.0
+
+  '@pitlane/vite-plugin-fetch-server@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-fetch-server@9b92b15c84093ef29f578dd91429ab41a5ee05e3':
+    resolution: {integrity: sha512-qqqNSlpyLcuTrECU0wDJ7V+TlYatFV1SeYnXgc0CE+b/+dORmTGEUxgIc3MoJwgGXnr0S/Q1Tx1bgYytdihPFw==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-fetch-server@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
     version: 0.0.0
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       vite: '>=8.1.0'
 
-  '@pitlane/vite-plugin-remix@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-remix@730ef15e9de969aebd4629bd7c4aa952500b4dbf':
-    resolution: {integrity: sha512-M3bq1u9qjCuGmBD1/k2qTqrFeGAQMF8d+WB9Y+QpOpMJfHIhnr1J5gIkGWVYmYOCpgA0QPo2v0VzgkXVRRnZ3w==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-remix@730ef15e9de969aebd4629bd7c4aa952500b4dbf}
+  '@pitlane/vite-plugin-remix@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-remix@9b92b15c84093ef29f578dd91429ab41a5ee05e3':
+    resolution: {integrity: sha512-aFJFpIargQyga/7FfBGfchiyhyNlzuTBT1vIoEtEfX7yLyvfsUd0Cs9owuXAGqrr+Uqr+LnZ6k2jcRV5Yypw7g==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-remix@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
     version: 0.7.1
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
@@ -2786,6 +2804,9 @@ packages:
     resolution: {integrity: sha512-X7sjQzceUhu1u7Y/ylrRZFU2FS6LRiFVp6rKLPg23y3x3c3DOKAwuXGDp+PAGjh6CSnCjYeAul8pcT8bAl+lSA==}
     engines: {node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0}
 
+  csstype@3.2.3:
+    resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
+
   data-urls@7.0.0:
     resolution: {integrity: sha512-23XHcCF+coGYevirZceTVD7NdJOqVn+49IHyxgszm+JIiHLoB2TkmPtsYkNWT1pvRSGkc35L6NHs0yHkN2SumA==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
@@ -3354,6 +3375,18 @@ packages:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
 
+  pitlane@https://pkg.pr.new/pitlane-tools/pitlane/pitlane@9b92b15c84093ef29f578dd91429ab41a5ee05e3:
+    resolution: {integrity: sha512-zVB7kdwxzuR/Qcc9n+BK2BMQwszmgTWx2Y4GdJTkPdrifDyfd/m+Vr/5BSMwVGfgX29x/UUS5kxyzUyD8T0RVg==, tarball: https://pkg.pr.new/pitlane-tools/pitlane/pitlane@9b92b15c84093ef29f578dd91429ab41a5ee05e3}
+    version: 1.0.0-alpha.1
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      remix: ^3.0.0
+      satteri: ^0.10.5
+      vite: '>=8.1.0'
+    peerDependenciesMeta:
+      satteri:
+        optional: true
+
   playwright-core@1.61.1:
     resolution: {integrity: sha512-h7Qlt6m4REp25qvIdvbDtVmD4LqVXfpRxhORv9L0jzETM05p4fuPJ3dKyuSXQxDSbXnmS79HAgi9589lGSpLkg==}
     engines: {node: '>=18'}
@@ -3808,6 +3841,11 @@ packages:
   xmlchars@2.2.0:
     resolution: {integrity: sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==}
 
+  yaml@2.9.1:
+    resolution: {integrity: sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw==}
+    engines: {node: '>= 14.6'}
+    hasBin: true
+
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
@@ -3879,12 +3917,12 @@ snapshots:
     optionalDependencies:
       workerd: 1.20260918.1
 
-  '@cloudflare/vite-plugin@1.35.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(workerd@1.20260430.1)(wrangler@4.87.0)':
+  '@cloudflare/vite-plugin@1.35.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(workerd@1.20260430.1)(wrangler@4.87.0)':
     dependencies:
       '@cloudflare/unenv-preset': 2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260430.1)
       miniflare: 4.20260430.0
       unenv: 2.0.0-rc.24
-      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)'
+      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
       wrangler: 4.87.0
       ws: 8.18.0
     transitivePeerDependencies:
@@ -3899,7 +3937,7 @@ snapshots:
       cjs-module-lexer: 1.2.3
       esbuild: 0.28.1
       miniflare: 5.20260918.0-alpha(@types/node@25.6.0)
-      vitest: 4.1.11(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(jsdom@30.1.0)
+      vitest: 4.1.11(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(jsdom@30.1.0)
       wrangler: 4.135.0(@types/node@25.6.0)
       zod: 4.4.3
     transitivePeerDependencies:
@@ -4931,33 +4969,46 @@ snapshots:
 
   '@oxlint/plugins@1.79.0': {}
 
-  '@pitlane/assets@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@730ef15e9de969aebd4629bd7c4aa952500b4dbf(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))':
+  '@pitlane/assets@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))':
     dependencies:
       magic-string: 0.30.21
     optionalDependencies:
-      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)'
+      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
 
-  '@pitlane/crawler@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/crawler@730ef15e9de969aebd4629bd7c4aa952500b4dbf(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
+  '@pitlane/content@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/content@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
+    dependencies:
+      es-module-lexer: 2.3.2
+      yaml: 2.9.1
+    optionalDependencies:
+      remix: 3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)
+      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
+
+  '@pitlane/crawler@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/crawler@9b92b15c84093ef29f578dd91429ab41a5ee05e3(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
     dependencies:
       remix: 3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)
 
-  '@pitlane/data-table-d1@0.3.0(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
+  '@pitlane/data-table-d1@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/data-table-d1@9b92b15c84093ef29f578dd91429ab41a5ee05e3(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
     dependencies:
       remix: 3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)
 
-  '@pitlane/vite-plugin-fetch-server@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-fetch-server@730ef15e9de969aebd4629bd7c4aa952500b4dbf(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))':
+  '@pitlane/theme@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/theme@9b92b15c84093ef29f578dd91429ab41a5ee05e3(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
+    dependencies:
+      csstype: 3.2.3
+      remix: 3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)
+
+  '@pitlane/vite-plugin-fetch-server@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-fetch-server@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))':
     dependencies:
       '@remix-run/node-fetch-server': 1.0.0
-      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)'
+      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
 
-  '@pitlane/vite-plugin-remix@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-remix@730ef15e9de969aebd4629bd7c4aa952500b4dbf(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
+  '@pitlane/vite-plugin-remix@https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-remix@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))':
     dependencies:
-      '@pitlane/assets': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@730ef15e9de969aebd4629bd7c4aa952500b4dbf(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))
-      '@pitlane/crawler': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/crawler@730ef15e9de969aebd4629bd7c4aa952500b4dbf(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
-      '@pitlane/vite-plugin-fetch-server': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-fetch-server@730ef15e9de969aebd4629bd7c4aa952500b4dbf(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))
+      '@pitlane/assets': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
+      '@pitlane/crawler': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/crawler@9b92b15c84093ef29f578dd91429ab41a5ee05e3(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
+      '@pitlane/vite-plugin-fetch-server': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-fetch-server@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
       magic-string: 0.30.21
       remix: 3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)
-      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)'
+      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
 
   '@polka/url@1.0.0-next.29': {}
 
@@ -5401,29 +5452,29 @@ snapshots:
   '@typescript/typescript-win32-x64@7.0.1-rc':
     optional: true
 
-  '@vitest/browser-preview@5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(vitest@4.1.11)':
+  '@vitest/browser-preview@5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(vitest@4.1.11)':
     dependencies:
       '@testing-library/dom': 10.4.2
       '@testing-library/user-event': 14.6.7(@testing-library/dom@10.4.2)
-      '@vitest/browser': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(vitest@4.1.11)
-      vitest: 4.1.11(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(jsdom@30.1.0)
+      '@vitest/browser': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(vitest@4.1.11)
+      vitest: 4.1.11(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(jsdom@30.1.0)
     transitivePeerDependencies:
       - bufferutil
       - msw
       - utf-8-validate
       - vite
 
-  '@vitest/browser@5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(vitest@4.1.11)':
+  '@vitest/browser@5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(vitest@4.1.11)':
     dependencies:
       '@blazediff/core': 1.10.0
-      '@vitest/mocker': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))
+      '@vitest/mocker': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
       '@vitest/ui': 5.0.3(vitest@4.1.11)
       '@vitest/utils': 5.0.3
       magic-string: 1.4.3
       pngjs: 7.0.0
       sirv: 3.0.2
       tinyrainbow: 3.2.0
-      vitest: 4.1.11(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(jsdom@30.1.0)
+      vitest: 4.1.11(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(jsdom@30.1.0)
       ws: 8.22.0
     transitivePeerDependencies:
       - bufferutil
@@ -5431,17 +5482,17 @@ snapshots:
       - utf-8-validate
       - vite
 
-  '@vitest/browser@5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(vitest@5.0.3)':
+  '@vitest/browser@5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(vitest@5.0.3)':
     dependencies:
       '@blazediff/core': 1.10.0
-      '@vitest/mocker': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))
+      '@vitest/mocker': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
       '@vitest/ui': 5.0.3(vitest@4.1.11)
       '@vitest/utils': 5.0.3
       magic-string: 1.4.3
       pngjs: 7.0.0
       sirv: 3.0.2
       tinyrainbow: 3.2.0
-      vitest: 5.0.3(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(jsdom@30.1.0)
+      vitest: 5.0.3(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(jsdom@30.1.0)
       ws: 8.22.0
     transitivePeerDependencies:
       - bufferutil
@@ -5458,22 +5509,22 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.1
 
-  '@vitest/mocker@4.1.11(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))':
+  '@vitest/mocker@4.1.11(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))':
     dependencies:
       '@vitest/spy': 4.1.11
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)'
+      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
 
-  '@vitest/mocker@5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))':
+  '@vitest/mocker@5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       '@vitest/spy': 5.0.3
       estree-walker: 3.0.3
       magic-string: 1.4.3
     optionalDependencies:
-      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)'
+      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
 
   '@vitest/pretty-format@4.1.11':
     dependencies:
@@ -5514,7 +5565,7 @@ snapshots:
       pathe: 2.0.3
       sirv: 3.0.2
       tinyrainbow: 3.2.0
-      vitest: 4.1.11(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(jsdom@30.1.0)
+      vitest: 4.1.11(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(jsdom@30.1.0)
 
   '@vitest/utils@4.1.11':
     dependencies:
@@ -5528,7 +5579,7 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.2.0
 
-  '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)':
+  '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)':
     dependencies:
       '@oxc-project/runtime': 0.153.0
       '@oxc-project/types': 0.153.0
@@ -5550,6 +5601,7 @@ snapshots:
       fsevents: 2.3.3
       tsx: 4.21.0
       typescript: 7.0.1-rc
+      yaml: 2.9.1
 
   '@voidzero-dev/vite-plus-darwin-arm64@1.1.0':
     optional: true
@@ -5714,6 +5766,8 @@ snapshots:
     dependencies:
       mdn-data: 2.27.1
       source-map-js: 1.2.1
+
+  csstype@3.2.3: {}
 
   data-urls@7.0.0:
     dependencies:
@@ -6339,7 +6393,7 @@ snapshots:
       - '@emnapi/core'
       - '@emnapi/runtime'
 
-  oxfmt@0.72.0(vite-plus@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc)):
+  oxfmt@0.72.0(vite-plus@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)):
     dependencies:
       tinypool: 2.2.0
     optionalDependencies:
@@ -6362,7 +6416,7 @@ snapshots:
       '@oxfmt/binding-win32-arm64-msvc': 0.72.0
       '@oxfmt/binding-win32-ia32-msvc': 0.72.0
       '@oxfmt/binding-win32-x64-msvc': 0.72.0
-      vite-plus: 1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc)
+      vite-plus: 1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)
 
   oxlint-tsgolint@0.22.1:
     optionalDependencies:
@@ -6382,7 +6436,7 @@ snapshots:
       '@oxlint-tsgolint/win32-arm64': 7.0.2003
       '@oxlint-tsgolint/win32-x64': 7.0.2003
 
-  oxlint@1.87.0(oxlint-tsgolint@7.0.2003)(vite-plus@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc)):
+  oxlint@1.87.0(oxlint-tsgolint@7.0.2003)(vite-plus@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)):
     optionalDependencies:
       '@oxlint/binding-android-arm-eabi': 1.87.0
       '@oxlint/binding-android-arm64': 1.87.0
@@ -6404,7 +6458,7 @@ snapshots:
       '@oxlint/binding-win32-ia32-msvc': 1.87.0
       '@oxlint/binding-win32-x64-msvc': 1.87.0
       oxlint-tsgolint: 7.0.2003
-      vite-plus: 1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc)
+      vite-plus: 1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)
 
   p-limit@3.1.0:
     dependencies:
@@ -6431,6 +6485,18 @@ snapshots:
   picomatch@4.0.4: {}
 
   picomatch@4.0.7: {}
+
+  pitlane@https://pkg.pr.new/pitlane-tools/pitlane/pitlane@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)):
+    dependencies:
+      '@pitlane/assets': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
+      '@pitlane/content': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/content@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
+      '@pitlane/crawler': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/crawler@9b92b15c84093ef29f578dd91429ab41a5ee05e3(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
+      '@pitlane/data-table-d1': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/data-table-d1@9b92b15c84093ef29f578dd91429ab41a5ee05e3(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
+      '@pitlane/theme': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/theme@9b92b15c84093ef29f578dd91429ab41a5ee05e3(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
+      '@pitlane/vite-plugin-fetch-server': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-fetch-server@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
+      '@pitlane/vite-plugin-remix': https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-remix@9b92b15c84093ef29f578dd91429ab41a5ee05e3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(remix@3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1))
+      remix: 3.0.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(playwright@1.61.1)
+      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
 
   playwright-core@1.61.1:
     optional: true
@@ -6734,27 +6800,27 @@ snapshots:
       '@types/istanbul-lib-coverage': 2.0.6
       convert-source-map: 2.0.0
 
-  vite-plugin-devtools-json@1.0.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)):
+  vite-plugin-devtools-json@1.0.0(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)):
     dependencies:
       uuid: 11.1.1
-      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)'
+      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
 
-  vite-plus@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc):
+  vite-plus@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1):
     dependencies:
       '@oxc-project/types': 0.153.0
       '@oxlint/plugins': 1.79.0
-      '@vitest/browser': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(vitest@5.0.3)
-      '@vitest/browser-preview': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(vitest@4.1.11)
-      '@vitest/mocker': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))
+      '@vitest/browser': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(vitest@5.0.3)
+      '@vitest/browser-preview': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(vitest@4.1.11)
+      '@vitest/mocker': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
       '@vitest/pretty-format': 5.0.3
       '@vitest/snapshot': 5.0.3
       '@vitest/spy': 5.0.3
       '@vitest/utils': 5.0.3
-      oxfmt: 0.72.0(vite-plus@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc))
-      oxlint: 1.87.0(oxlint-tsgolint@7.0.2003)(vite-plus@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc))
+      oxfmt: 0.72.0(vite-plus@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
+      oxlint: 1.87.0(oxlint-tsgolint@7.0.2003)(vite-plus@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(jsdom@30.1.0)(playwright@1.61.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
       oxlint-tsgolint: 7.0.2003
-      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)'
-      vitest: 5.0.3(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(jsdom@30.1.0)
+      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
+      vitest: 5.0.3(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(jsdom@30.1.0)
     optionalDependencies:
       '@voidzero-dev/vite-plus-darwin-arm64': 1.1.0
       '@voidzero-dev/vite-plus-darwin-x64': 1.1.0
@@ -6799,10 +6865,10 @@ snapshots:
       - vue-tsc
       - yaml
 
-  vitest@4.1.11(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(jsdom@30.1.0):
+  vitest@4.1.11(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(jsdom@30.1.0):
     dependencies:
       '@vitest/expect': 4.1.11
-      '@vitest/mocker': 4.1.11(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))
+      '@vitest/mocker': 4.1.11(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
       '@vitest/pretty-format': 4.1.11
       '@vitest/runner': 4.1.11
       '@vitest/snapshot': 4.1.11
@@ -6819,19 +6885,19 @@ snapshots:
       tinyexec: 1.1.2
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.1
-      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)'
+      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 25.6.0
-      '@vitest/browser-preview': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(vitest@4.1.11)
+      '@vitest/browser-preview': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(vitest@4.1.11)
       jsdom: 30.1.0
     transitivePeerDependencies:
       - msw
 
-  vitest@5.0.3(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(jsdom@30.1.0):
+  vitest@5.0.3(@types/node@25.6.0)(@vitest/browser-preview@5.0.3)(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(jsdom@30.1.0):
     dependencies:
       '@types/chai': 5.2.3
-      '@vitest/mocker': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))
+      '@vitest/mocker': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))
       chai: 6.3.0
       es-module-lexer: 2.3.2
       expect-type: 1.4.0
@@ -6842,11 +6908,11 @@ snapshots:
       tinybench: 6.2.1
       tinyexec: 1.3.1
       tinyglobby: 0.2.17
-      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)'
+      vite: '@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1)'
       why-is-node-running: 3.2.1
     optionalDependencies:
       '@types/node': 25.6.0
-      '@vitest/browser-preview': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc))(vitest@4.1.11)
+      '@vitest/browser-preview': 5.0.3(@voidzero-dev/vite-plus-core@1.1.0(@types/node@25.6.0)(esbuild@0.28.1)(tsx@4.21.0)(typescript@7.0.1-rc)(yaml@2.9.1))(vitest@4.1.11)
       jsdom: 30.1.0
     transitivePeerDependencies:
       - msw
@@ -6946,6 +7012,8 @@ snapshots:
   xml-name-validator@5.0.0: {}
 
   xmlchars@2.2.0: {}
+
+  yaml@2.9.1: {}
 
   yocto-queue@0.1.0: {}
 

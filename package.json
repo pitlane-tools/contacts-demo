@@ -6,6 +6,7 @@
         "#/*": "./app/*"
     },
     "dependencies": {
+        "@pitlane/assets": "https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/assets@730ef15e9de969aebd4629bd7c4aa952500b4dbf",
         "@pitlane/data-table-d1": "^0.3.0",
         "@std/jsonc": "jsr:^1.0.2",
         "es-toolkit": "^1.45.1",
@@ -15,7 +16,7 @@
     "devDependencies": {
         "@cloudflare/vite-plugin": "^1.31.0",
         "@cloudflare/vitest-plugin": "^1.1.13",
-        "@pitlane/dev": "^0.7.1",
+        "@pitlane/vite-plugin-remix": "https://pkg.pr.new/pitlane-tools/pitlane/@pitlane/vite-plugin-remix@730ef15e9de969aebd4629bd7c4aa952500b4dbf",
         "@types/node": "^25.5.0",
         "eslint-plugin-perfectionist": "^5.8.0",
         "eslint-plugin-prefer-let": "^4.2.2",

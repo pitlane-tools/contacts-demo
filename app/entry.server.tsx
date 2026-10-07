@@ -6,6 +6,7 @@ import { createRouter, type MiddlewareContext } from "remix/router";
 
 import contacts from "#/actions/contacts/controller.tsx";
 import controller from "#/actions/controller.tsx";
+import { assets } from "#/assets.ts";
 import { database, uploadErrors } from "#/middleware.ts";
 import { routes } from "#/routes.ts";
 import { UPLOAD_LIMITS, uploadHandler } from "#/utils/uploads.ts";
@@ -20,6 +21,7 @@ let middleware = [
     asyncContext(),
     database(),
     render({
+        assets,
         onError(error) {
             // Streaming render failures. The middleware suppresses this for its
             // own internal frame sub-requests, so it reports once per request.

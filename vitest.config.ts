@@ -1,14 +1,14 @@
 import type { Plugin, PluginOption } from "vite";
 
 import { cloudflareTest, readD1Migrations } from "@cloudflare/vitest-plugin";
-import { remix } from "@pitlane/dev";
+import { remix } from "@pitlane/vite-plugin-remix";
 import { defineConfig } from "vitest/config";
 
 // Read once at config time, in Node — `applyD1Migrations` needs the SQL as data
 // because the test worker has no filesystem.
 let migrations = await readD1Migrations("./db/d1-migrations");
 
-// The app's own transforms: `clientEntry()`, `?assets=ssr`, `pitlane:dev`.
+// The app's own transforms: `clientEntry()` and the `@pitlane/assets/manifest`.
 // Without them neither the router's module graph nor a component imports.
 let appPlugins = (): PluginOption => remix({ serverHandler: false });
 

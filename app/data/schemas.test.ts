@@ -1,6 +1,7 @@
-import { UpdateSchema } from "#/data/schemas.ts";
 import * as s from "remix/data-schema";
 import { describe, expect, it } from "vitest";
+
+import { UpdateSchema } from "#/data/schemas.ts";
 
 function submit(fields: Record<string, string>) {
     let formData = new FormData();

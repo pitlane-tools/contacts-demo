@@ -1,5 +1,5 @@
 import { cloudflare } from "@cloudflare/vite-plugin";
-import { remix } from "@pitlane/dev";
+import { remix } from "pitlane/vite-plugin-remix";
 import devtoolsJson from "vite-plugin-devtools-json";
 import { defineConfig } from "vite-plus";
 
@@ -47,7 +47,7 @@ export default defineConfig({
                 cache: false,
             },
             typegen: {
-                input: ["wrangler.jsonc"],
+                cache: { input: ["wrangler.jsonc"] },
                 command: "wrangler types",
             },
             typecheck: {

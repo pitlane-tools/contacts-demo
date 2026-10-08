@@ -12,6 +12,8 @@ This repository contains a comprehensive overview of the Remix API, its runtime 
 
 > Take a look at the files in `./.claude/docs/**/*.md` for detailed documentation on the many functions of the `remix` APIs.
 
+Before changing Pitlane code, read `node_modules/pitlane/INDEX.md`; prefer the installed documentation over memory or the latest website.
+
 ## Debugging Approach
 
 - Use `console.log` with clear prefixes during development

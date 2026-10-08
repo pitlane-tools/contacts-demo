@@ -60,7 +60,7 @@ wrangler.jsonc           # Cloudflare bindings (D1, R2, assets)
 
 **No `public/` directories inside `app/`.** (The repo root still has one — Vite's static directory, copied into `dist/client` at build time. Different thing.) Upstream colocates `clientEntry()` components under `app/**/public/**`, but that is not a stylistic convention: it is the allowlist `remix/assets`' asset server matches when deciding which source files it may compile and serve. The guides call `allowFiles` "a security boundary, not merely compilation configuration". This app bundles with Vite, which resolves the browser module graph from the `clientEntry()` calls themselves, so such a directory would allowlist nothing and buy nothing. Hydrated components sit beside their server-only siblings, and `clientEntry()` in the source is the marker that a component crosses the network boundary.
 
-**Why `entry.server.tsx` and not `router.ts`:** upstream names the server module `router.ts`. This app can't, for two reasons. It is the value of `main` in `wrangler.jsonc` (`"./app/entry.server.tsx"`), so it is the Cloudflare Workers module entry, and `app/ui/document.tsx` imports `#/entry.server.tsx?assets=ssr` to collect the SSR asset graph. The name is load-bearing in both places.
+**Why `entry.server.tsx` and not `router.ts`:** upstream names the server module `router.ts`. This app can't, for two reasons. It is the value of `main` in `wrangler.jsonc` (`"./app/entry.server.tsx"`), so it is the Cloudflare Workers module entry, and `app/assets.ts` calls `assets.getStylesheets("app/entry.server.tsx")` to collect the SSR stylesheets. The name is load-bearing in both places.
 
 **Imports:** `#/` (from `package.json#imports`) for anything outside the current directory; plain relative imports only for same-directory siblings — `app/actions/controller.tsx` imports `./sidebar.tsx`, and `app/ui/document.tsx` imports `./restful-form.tsx`. See Recipe 36.
 
@@ -133,17 +133,17 @@ export let LikeButton = clientEntry(
 
 **Important:** All props passed to a `clientEntry` component must be serializable (strings, numbers, booleans, plain objects, arrays). The server serializes them as JSON for the client to hydrate. You cannot pass functions, class instances, or DOM nodes as props to hydrated components.
 
-**Why `import.meta.url`, and why you must not simplify it away.** Upstream passes it so its asset server can map a `file:` URL to a compiled, served module — `clientEntry`'s documented default is really `"/js/module.js#ExportName"` (`ui/src/runtime/client-entries.ts:56`). Here it is a _transform marker_: `@pitlane/dev` matches the literal `clientEntry(import.meta.url, …)` call shape and rewrites the argument at transform time. The compiled SSR bundle shows what it becomes:
+**Why `import.meta.url`, and why you must not simplify it away.** Upstream passes it so its asset server can map a `file:` URL to a compiled, served module — `clientEntry`'s documented default is really `"/js/module.js#ExportName"` (`ui/src/runtime/client-entries.ts:56`). Here it is a _transform marker_: `@pitlane/vite-plugin-remix` matches the literal `clientEntry(import.meta.url, …)` call shape and rewrites the argument at transform time to a portable, project-relative entry ID. The compiled SSR bundle shows what it becomes:
 
 ```js
-clientEntry(mergeAssets(__assets_manifest["client"]["app/actions/contacts/favorite-button.tsx"]).entry + "#FavoriteButton", …)
+clientEntry("file:app/actions/contacts/favorite-button.tsx#FavoriteButton", …)
 ```
 
-So the renderer never sees a `file:` entry ID and never consults an asset server. Replace the argument with a string and the transform stops matching.
+`render({ assets })` in `entry.server.tsx` resolves that ID through the `@pitlane/assets` resolver from `app/assets.ts` to the built chunk URL, and emits `modulepreload` links for the island. Replace the argument with a string and the transform stops matching; drop `assets` from `render()` and the first island render fails.
 
 **A failed hydration is silent.** `frame.ts:1323-1325` catches every client-entry load failure, logs `[createFrame] Failed to load module`, and returns `undefined` — it does not dispatch the runtime `error` event and does not reject `ready()`, so the app's error banner never fires. A broken island therefore degrades to its server-rendered markup. That is the right default, but it only helps if the markup works on its own, which is the real argument for Recipe 21's no-JS favorite toggle: an island that hydrates into behavior the HTML cannot express fails invisibly.
 
-**Deliberately omitted.** Every upstream demo's browser entry also installs `processClientEntryPreloads` and routes `loadModule` through `remix/multiple-import-maps-polyfill`. Both exist solely to cope with import maps added after the initial document — the demos use the hook for nothing but `detectMultipleImportMapSupport()`. A Vite bundle has no import maps at all, so this app uses plain `import()` and sets no hook. The demos' `app.ready().catch(…)` is skipped too: `run()` already dispatches the error itself (`run.ts:167-170`), and the only rejection paths are sub-frame and pending-template failures, which cannot occur in a document where `render()` fills both frames server-side.
+**Deliberately omitted.** Every upstream demo's browser entry also installs `processClientEntryPreloads` and routes `loadModule` through `remix/multiple-import-maps-polyfill`. Both exist solely to cope with import maps added after the initial document — the demos use the hook for nothing but `detectMultipleImportMapSupport()`. This app's only import map is the chunk import map the document renders once in `<head>` (`<ImportMap value={scriptEntry.importMap} />`), so it uses plain `import()` and sets no hook. The demos' `app.ready().catch(…)` is skipped too: `run()` already dispatches the error itself (`run.ts:167-170`), and the only rejection paths are sub-frame and pending-template failures, which cannot occur in a document where `render()` fills both frames server-side.
 
 ---
 
@@ -292,8 +292,8 @@ This is **not** how ordinary POSTs work anymore — it is the optimism escape ha
 **Method override for PUT/PATCH/DELETE:** HTML forms only support GET and POST. For other HTTP methods, use a hidden `_method` field with the `methodOverride()` middleware. `app/ui/restful-form.tsx` wraps the pattern so no form repeats the boilerplate:
 
 ```tsx
-import type { RequestMethod } from "remix/router";
 import type { Handle } from "remix/component";
+import type { RequestMethod } from "remix/router";
 
 export function RestfulForm(
     handle: Handle<JSX.IntrinsicHTMLElements["form"] & { method?: RequestMethod | "ANY" }>,
@@ -552,7 +552,6 @@ Not every app needs frames. A simple single-column page that always renders as a
 
 ```tsx
 <body>
-    <HMR />
     <div id="root">
         <div id="sidebar">
             <h1>{SITE.title}</h1>
@@ -711,16 +710,18 @@ router.map(routes.posts, postsController); // Maps all sub-routes to a controlle
 **Recommended middleware stack** (`app/entry.server.tsx`):
 
 ```tsx
-import contacts from "#/actions/contacts/controller.tsx";
-import controller from "#/actions/controller.tsx";
-import { database, uploadErrors } from "#/middleware.ts";
-import { routes } from "#/routes.ts";
-import { UPLOAD_LIMITS, uploadHandler } from "#/utils/uploads.ts";
 import { asyncContext } from "remix/middleware/async-context";
 import { formData } from "remix/middleware/form-data";
 import { methodOverride } from "remix/middleware/method-override";
 import { render } from "remix/middleware/render";
 import { createRouter, type MiddlewareContext } from "remix/router";
+
+import contacts from "#/actions/contacts/controller.tsx";
+import controller from "#/actions/controller.tsx";
+import { assets } from "#/assets.ts";
+import { database, uploadErrors } from "#/middleware.ts";
+import { routes } from "#/routes.ts";
+import { UPLOAD_LIMITS, uploadHandler } from "#/utils/uploads.ts";
 
 let middleware = [
     uploadErrors(),
@@ -729,6 +730,7 @@ let middleware = [
     asyncContext(),
     database(),
     render({
+        assets,
         onError(error) {
             console.error(error);
         },
@@ -788,7 +790,7 @@ async home(ctx) {
 
 It also owns everything awkward about resolving a frame's `src` on the server: it forwards the incoming request's credentials and cookies, strips hop-by-hop headers and every `sec-fetch-*` header, forces the sub-request to `GET`, follows redirects up to a limit of 20, trims headers down to a safe subset when a frame points at another origin, and cancels in-flight frame work when the client disconnects. None of that is code you write.
 
-**No `assets` option.** `render()` accepts `{ assets?, onError? }`, and this app passes neither. The `assets` server exists only to turn a `file:`-prefixed client-entry ID into a browser module URL. `@pitlane/dev`'s `clientEntryTransform` already does that at transform time: in server environments it rewrites the `import.meta.url` argument of `clientEntry(import.meta.url, …)` into `___clientEntryAssets.entry + "#ExportName"`, a public chunk URL. The entry ID the renderer sees is therefore never a `file:` URL, so it takes the pass-through branch and no asset server is consulted. Do not add `remix/assets`, `createAssetServer`, or `<ImportMap>` to a `@pitlane/dev` build — they solve a problem the transform has already solved.
+**Pass `assets`.** `render()` accepts `{ assets?, onError? }`. `@pitlane/vite-plugin-remix` rewrites the `import.meta.url` argument of `clientEntry(import.meta.url, …)` into a `file:app/…#ExportName` entry ID, and the renderer resolves that ID through the `assets` option to the built chunk URL plus its `modulepreload` hints. `app/assets.ts` builds that resolver with `createAssetResolver(manifest)` from `@pitlane/assets`; without it the first island render fails. Do not add `remix/assets` or `createAssetServer` — Vite builds and serves the modules.
 
 **Don't catch thrown `Response`s.** A generic rescue middleware that does `catch (error) { if (error instanceof Response) return error }` has no upstream precedent. `fetch-router` never catches thrown Responses — its middleware runner has no `try`/`catch` at all, and its only `instanceof Response` check is on a middleware's _return_ value. Canonical code returns a `Response`; throwing one just means the framework sees an unhandled exception. `uploadErrors()` is the shape upstream actually demonstrates: catch one real error type you own, convert it to a response.
 
@@ -828,6 +830,7 @@ A few of those rows deserve their reasoning spelled out, because the obvious alt
 
 ```tsx
 import { createController } from "remix/router";
+
 import { routes } from "#/routes.ts";
 
 export default createController(routes.posts, {
@@ -1018,8 +1021,9 @@ No component in this app currently _listens_ for these events — search owns it
 ```tsx
 import type { Handle } from "remix/component";
 
-import { applyPageMetadata } from "#/utils/page-metadata.ts";
 import { createRoot, on, run } from "remix/component";
+
+import { applyPageMetadata } from "#/utils/page-metadata.ts";
 
 let app = run({
     async loadModule(moduleUrl, exportName) {
@@ -1188,8 +1192,8 @@ import { Database } from "remix/data-table";
 **Set it in middleware** (`app/middleware.ts`):
 
 ```tsx
-import { createD1Database } from "@pitlane/data-table-d1";
 import { env } from "cloudflare:workers";
+import { createD1Database } from "pitlane/data-table-d1";
 import { Database } from "remix/data-table";
 import { type Middleware } from "remix/router";
 
@@ -1574,12 +1578,12 @@ drop table if exists "posts";
 >
 > Per-migration transaction behavior is set with a directive on the first non-blank line of `up.sql`: `-- data-table/transaction: none` (modes: `auto` default, `required`, `none`).
 
-**Compiling to SQL** — `generateD1Migrations` from `@pitlane/data-table-d1/migrations` reads each migration's `up.sql` and writes one Wrangler-shaped `.sql` file per migration, then deletes generated files with no migration behind them so the output directory is a pure function of the input one:
+**Compiling to SQL** — `generateD1Migrations` from `pitlane/data-table-d1/migrations` reads each migration's `up.sql` and writes one Wrangler-shaped `.sql` file per migration, then deletes generated files with no migration behind them so the output directory is a pure function of the input one:
 
 ```tsx
 // db/generate-d1-migrations.ts
-import { generateD1Migrations } from "@pitlane/data-table-d1/migrations";
 import path from "node:path";
+import { generateD1Migrations } from "pitlane/data-table-d1/migrations";
 
 import { parseWranglerConfig } from "./lib/wrangler-config.ts";
 
@@ -1602,9 +1606,10 @@ The helper copies each `up.sql` **verbatim** rather than splitting it into state
 
 ```tsx
 // db/seed.ts
-import { Posts } from "#/data/posts.ts";
-import { createD1Database } from "@pitlane/data-table-d1";
+import { createD1Database } from "pitlane/data-table-d1";
 import { getPlatformProxy } from "wrangler";
+
+import { Posts } from "#/data/posts.ts";
 
 let proxy = await getPlatformProxy<Env>({ configPath: "./wrangler.jsonc", persist: true });
 
@@ -1715,6 +1720,7 @@ The apply helper is a thin wrapper around `wrangler`:
 ```tsx
 // db/apply-d1-migrations.ts (simplified)
 import { parseArgs } from "node:util";
+
 import { buildApplyCommand, runApplyCommand } from "./lib/wrangler-cli.ts";
 import { parseWranglerConfig } from "./lib/wrangler-config.ts";
 
@@ -1873,10 +1879,9 @@ The client handles the state update optimistically and doesn't need a redirect.
 
 ```tsx
 import { cloudflare } from "@cloudflare/vite-plugin";
+import { remix } from "pitlane/vite-plugin-remix";
 import devtoolsJson from "vite-plugin-devtools-json";
 import { defineConfig } from "vite-plus";
-
-import { remix } from "@pitlane/dev";
 
 export default defineConfig({
     plugins: [
@@ -1916,7 +1921,7 @@ export default defineConfig({
                 cache: false,
             },
             typegen: {
-                input: ["wrangler.jsonc"],
+                cache: { input: ["wrangler.jsonc"] },
                 command: "wrangler types",
             },
             typecheck: {
@@ -1937,12 +1942,8 @@ export default defineConfig({
             deploy: { command: "wrangler deploy", cache: false },
         },
     },
-    fmt: {
-        /* Oxfmt options */
-    },
-    lint: {
-        /* Oxlint options */
-    },
+    fmt: {/* Oxfmt options */},
+    lint: {/* Oxlint options */},
 });
 ```
 
@@ -1954,16 +1955,17 @@ export default defineConfig({
 **Run tasks:** The `run.tasks` config defines orchestrated commands that `vp run <task>` executes. Key patterns:
 
 - **`dependsOn`:** Ensures prerequisites run first. `dev` chains `typegen` (generates `Env` types from `wrangler.jsonc`) and `db:seed` (which itself chains `db:migrations:apply:local` → `db:migrations:generate`).
-- **`input`:** File-based cache invalidation. `typegen` only reruns when `wrangler.jsonc` changes.
+- **`cache.input`:** File-based cache invalidation. `typegen` only reruns when `wrangler.jsonc` changes.
 - **`cache: false`:** Disables caching for tasks that should always run (typecheck, deploy, migrations).
 - **`db:reset`:** Deletes local D1 state for a clean slate during development.
 - **`test`:** Runs Vitest (see Recipe 32). Depends on `db:migrations:generate` so the schema the worker tests apply is never stale.
 
-**What `@pitlane/dev`'s `remix()` plugin provides:**
+**What `@pitlane/vite-plugin-remix`'s `remix()` plugin provides:**
 
 - **Build orchestration:** Builds SSR then client environments, with separate output directories (`dist/ssr`, `dist/client`)
 - **Preview server:** Loads the built SSR entry and creates a request listener for `vp preview`
-- **Client entry transforms:** Automatically resolves `import.meta.url` in `clientEntry()` calls to the correct asset URLs for both server and client environments
+- **Client entry transforms:** Rewrites `import.meta.url` in `clientEntry()` calls to a portable `file:app/…#ExportName` entry ID that `render({ assets })` resolves
+- **Asset manifest:** Composes `assets()` from `pitlane/assets/vite-plugin`, which supplies `pitlane/assets/manifest` and turns on Vite's chunk import map for the client build
 - **Error suppression:** Prevents abort errors from cancelled requests (e.g., search-as-you-type) from triggering the Vite error overlay
 
 **Commands:**
@@ -1988,10 +1990,11 @@ export default defineConfig({
 `app/actions/contacts/sidebar-item.tsx`, in full:
 
 ```tsx
+import { clientEntry, type Handle, type SerializableProps } from "remix/component";
+import { createMultiMatcher } from "remix/route-pattern/match";
+
 import { routes } from "#/routes.ts";
 import { isServer, onDestinationChange, pendingDestination } from "#/utils/pending-navigation.ts";
-import { createMultiMatcher } from "remix/route-pattern/match";
-import { clientEntry, type Handle, type SerializableProps } from "remix/component";
 
 let matcher = createMultiMatcher<true>();
 matcher.add(routes.contacts.show.pattern, true);
@@ -2272,54 +2275,46 @@ async resolveFrame(src, options) {
 
 ---
 
-### 23. How do asset imports work in the document shell?
+### 23. How do asset URLs work in the document shell?
 
 **Decision:** How do I wire up scripts, stylesheets, and preload links in my HTML document?
 
-**Heuristic:** Use Vite's asset import specifiers to resolve paths at build time. Never hardcode asset paths in components.
+**Heuristic:** Ask the asset resolver for them by project-relative source path. Never hardcode asset paths in components.
 
-**The three import types:**
+**The resolver** (`app/assets.ts`):
 
-```tsx
-// Client entry module — resolves hydration script + its dependencies
-import clientAssets from "#/entry.browser.tsx?assets=client";
+```ts
+import { createAssetResolver } from "pitlane/assets";
+import manifest from "pitlane/assets/manifest";
 
-// SSR assets — resolves server-rendered module dependencies (CSS, JS preloads)
-import serverAssets from "#/entry.server.tsx?assets=ssr";
+export let assets = createAssetResolver(manifest);
 
-// Standalone stylesheet — resolves to a URL string
-import styles from "#/index.css?url";
+export let scriptEntry = await assets.getScriptEntry("app/entry.browser.tsx");
+export let stylesheets = await assets.getStylesheets("app/entry.server.tsx");
+export let indexStylesheetHref = await assets.getHref("app/index.css");
 ```
 
-**Merging assets in the document shell:**
+**Rendering them in the document shell:**
 
 ```tsx
-import { mergeAssets } from "@pitlane/dev/runtime";
-import clientAssets from "#/entry.browser.tsx?assets=client";
-import serverAssets from "#/entry.server.tsx?assets=ssr";
-import styles from "#/index.css?url";
+import { ImportMap } from "remix/component/server";
+
+import { indexStylesheetHref, scriptEntry, stylesheets } from "#/assets.ts";
 
 export function Document() {
-    let { css, js } = mergeAssets(clientAssets, serverAssets);
-
     return () => (
         <html lang="en">
             <head>
-                {/* Standalone CSS file — use ?url import */}
-                <link href={styles} rel="stylesheet" />
-
-                {/* Asset-resolved CSS from component modules */}
-                {css.map(attrs => (
-                    <link key={attrs.href} {...attrs} rel="stylesheet" />
+                <link href={indexStylesheetHref} rel="stylesheet" />
+                {stylesheets.map(href => (
+                    <link href={href} key={href} rel="stylesheet" />
                 ))}
 
-                {/* Client entry script */}
-                <script async src={clientAssets.entry} type="module" />
-
-                {/* Preload links for JS dependencies */}
-                {js.map(attrs => (
-                    <link key={attrs.href} {...attrs} rel="modulepreload" />
+                <ImportMap value={scriptEntry.importMap} />
+                {scriptEntry.preloads.map(href => (
+                    <link href={href} key={href} rel="modulepreload" />
                 ))}
+                <script async src={scriptEntry.href} type="module" />
             </head>
             <body>{/* ... */}</body>
         </html>
@@ -2329,11 +2324,11 @@ export function Document() {
 
 **Key rules:**
 
-- Use `?assets=client` for the client entry module (the one passed to `run()`)
-- Use `?assets=ssr` for server-rendered modules that contribute CSS or JS to the document. Only use this for module assets (`.tsx`, `.ts`), not plain `.css` files
-- Use `?url` for standalone stylesheets — this gives you a plain URL string for a `<link>` tag
-- Render `clientAssets.entry` as the `<script>` src — never hardcode `/remix/assets/...` paths
-- Pitlane transforms `import.meta.url` in strict, top-level `export const Name = clientEntry(import.meta.url, …)` calls into the correct `?assets=client` imports automatically, so component files remain source-oriented
+- Resolver keys are project-relative source paths, written as string literals
+- `getScriptEntry()` for the browser entry (the module that calls `run()`): its `href`, `preloads`, and `importMap`
+- `getStylesheets()` for the CSS a server module's graph imports; `getHref()` for a standalone file such as `app/index.css`
+- `<ImportMap>` must come before every `modulepreload` link and module script: the build emits a chunk import map
+- Pass the same `assets` to `render({ assets })` in `entry.server.tsx`; it resolves each island's `file:` entry ID and adds its `modulepreload` links
 
 ---
 
@@ -2920,7 +2915,7 @@ export default defineConfig({
 
 Four details that are easy to get wrong:
 
-- **The app's Vite plugins belong in both projects.** `@pitlane/dev`'s `remix()` provides `clientEntry()`, `?assets=ssr` and `pitlane:dev`. Without it the module graph will not even import.
+- **The app's Vite plugins belong in both projects.** `@pitlane/vite-plugin-remix`'s `remix()` provides the `clientEntry()` transform and `pitlane/assets/manifest`. Without it the module graph will not even import.
 - **Component HMR must be filtered out of the `dom` project.** It rewrites modules to talk to a dev-server registry no test runtime provides, and fails with `Cannot read properties of undefined (reading 'componentNamesByModuleUrl')`. It is a `vite dev` concern.
 - **D1 needs its schema as data.** Workerd has no filesystem, so `readD1Migrations()` reads the generated SQL in Node at config time and a setup file applies it with `applyD1Migrations()`. `vp run test` depends on `db:migrations:generate` so the two cannot drift.
 - **Set `NODE_ENV=test` as a binding.** `fakeNetwork()` sleeps 1–3s per uncached call unless it sees it, and workerd does not set it. Worth 9.1s → 1.6s on this suite.
@@ -2951,8 +2946,8 @@ This runs the whole stack — middleware, method override, router, controller, r
 **Component test** — `render()` from `remix/component/test` works unchanged under jsdom:
 
 ```tsx
-import { describe, expect, it, onTestFinished } from "vitest";
 import { render } from "remix/component/test";
+import { describe, expect, it, onTestFinished } from "vitest";
 
 describe("FavoriteButton", () => {
     it("shows the current state but submits the desired one", () => {
@@ -2990,8 +2985,8 @@ describe("FavoriteButton", () => {
 
 ```tsx
 import { createCookie } from "remix/cookie";
-import { Session } from "remix/session";
 import { session } from "remix/middleware/session";
+import { Session } from "remix/session";
 import { createCookieSessionStorage } from "remix/session-storage/cookie";
 
 // 1. Create a signed cookie (secrets are required)
@@ -3117,8 +3112,8 @@ session.destroy(); // Clears all data, clears client cookie on next response
 
 ```tsx
 import { auth, createSessionAuthScheme, requireAuth } from "remix/middleware/auth";
-import { Session } from "remix/session";
 import { session } from "remix/middleware/session";
+import { Session } from "remix/session";
 
 let router = createRouter({
     middleware: [
@@ -3228,8 +3223,9 @@ The logout form is also a plain `<form method="POST">` — no JavaScript require
 **Protecting routes:**
 
 ```tsx
-import { Auth, requireAuth } from "remix/middleware/auth";
 import type { GoodAuth } from "remix/middleware/auth";
+
+import { Auth, requireAuth } from "remix/middleware/auth";
 
 router.map(routes.dashboard, {
     middleware: [requireAuth()],
@@ -3307,9 +3303,7 @@ import { createBearerTokenAuthScheme, createSessionAuthScheme } from "remix/midd
 
 auth({
     schemes: [
-        createSessionAuthScheme({
-            /* ... */
-        }),
+        createSessionAuthScheme({/* ... */}),
         createBearerTokenAuthScheme({
             async verify(token) {
                 return apiKeys.validate(token);
@@ -3332,9 +3326,10 @@ auth({
 ```tsx
 import type { FileUpload } from "remix/form-data-parser";
 
+import { env } from "cloudflare:workers";
+
 import { R2FileStorage } from "#/data/adapters/r2-file-storage.ts";
 import { routes } from "#/routes.ts";
-import { env } from "cloudflare:workers";
 
 const ALLOWED_TYPE: Record<string, true> = {
     "image/avif": true,
@@ -3563,7 +3558,7 @@ The `#` prefix is the only one that works everywhere without configuration beyon
         "lib": ["DOM", "DOM.Iterable", "ESNext"],
         "target": "ESNext",
         "module": "ESNext",
-        "types": ["@types/node", "vite-plus/client", "@pitlane/dev/assets"],
+        "types": ["@types/node", "vite-plus/client"],
         "moduleResolution": "bundler",
         "jsx": "react-jsx",
         "jsxImportSource": "remix/component",
@@ -3640,7 +3635,7 @@ Wire this into your `vite.config.ts` as a run task so types are regenerated when
 run: {
     tasks: {
         typegen: {
-            input: ["wrangler.jsonc"],
+            cache: { input: ["wrangler.jsonc"] },
             command: "wrangler types",
         },
     },
@@ -3656,8 +3651,8 @@ let db = env.DB;
 let bucket = env.FILES;
 
 // In middleware (preferred — inject into request context)
-import { createD1Database } from "@pitlane/data-table-d1";
 import { env } from "cloudflare:workers";
+import { createD1Database } from "pitlane/data-table-d1";
 import { Database } from "remix/data-table";
 import { type Middleware } from "remix/router";
 
@@ -3687,14 +3682,14 @@ export function database(): Middleware<DatabaseEntry> {
 Don't hand-write an adapter. `@pitlane/data-table-d1` supplies `createD1Database(binding, options?)`, which returns a `D1Database extends Database<"sqlite">` — every query, persistence, and migration method comes from `remix/data-table` unchanged:
 
 ```tsx
-import { createD1Database } from "@pitlane/data-table-d1";
 import { env } from "cloudflare:workers";
+import { createD1Database } from "pitlane/data-table-d1";
 
 let db = createD1Database(env.DB);
 let contacts = await db.findMany(Contacts);
 ```
 
-Its Node-only migration half lives behind a separate `@pitlane/data-table-d1/migrations` entry point so nothing from it can reach a Worker bundle — see Recipe 18.
+Its Node-only migration half lives behind a separate `pitlane/data-table-d1/migrations` entry point so nothing from it can reach a Worker bundle — see Recipe 18.
 
 **D1 limitations to know:**
 

@@ -35,8 +35,9 @@ The Vite plugin from `docs/remix-client-entry-plugin.md`. Contains two plugins:
 #### `vite.config.ts`
 
 ```ts
-import { remix } from "./remix.plugin.ts";
 import { defineConfig } from "vite-plus";
+
+import { remix } from "./remix.plugin.ts";
 
 export default defineConfig({
     resolve: {
@@ -148,6 +149,7 @@ Replace the hardcoded `<link href="/index.css">` and `<script src="/assets/entry
 
 ```tsx
 import { mergeAssets } from "@hiogawa/vite-plugin-fullstack/runtime";
+
 import clientAssets from "~/assets/entry.tsx?assets=client";
 import serverAssets from "~/entry.server.tsx?assets=ssr";
 import styles from "~/styles/index.css?url";

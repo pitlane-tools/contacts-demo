@@ -1,7 +1,9 @@
 import type { Handle } from "remix/component";
 
-import { applyPageMetadata } from "#/utils/page-metadata.ts";
+import { revalidate } from "pitlane/vite-plugin-remix/hmr";
 import { createRoot, on, run } from "remix/component";
+
+import { applyPageMetadata } from "#/utils/page-metadata.ts";
 
 let app = run({
     async loadModule(moduleUrl, exportName) {
@@ -47,6 +49,11 @@ let app = run({
         return response;
     },
 });
+
+// Server-only edits in `vite dev` revalidate the page in place.
+if (import.meta.hot) {
+    import.meta.hot.on("server:update", () => revalidate(app));
+}
 
 // Global error boundary — renders a dismissible banner for any error dispatched
 // on the app runtime, including failed frame navigations and submissions.

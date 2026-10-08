@@ -18,8 +18,9 @@ or identity-bound writes, see `auth-and-sessions.md`.
 Define tables with typed columns, relations, and optional validation hooks:
 
 ```typescript
-import { belongsTo, column as c, hasMany, table } from "remix/data-table";
 import type { TableRow, TableRowWith } from "remix/data-table";
+
+import { belongsTo, column as c, hasMany, table } from "remix/data-table";
 
 export const books = table({
     name: "books",
@@ -91,9 +92,7 @@ Tables can define `validate`, `beforeWrite`, and `afterRead` hooks:
 ```typescript
 export const books = table({
     name: "books",
-    columns: {
-        /* ... */
-    },
+    columns: {/* ... */},
     validate({ operation, value }) {
         let issues = [];
         if (operation === "create" && !value.slug) {
@@ -139,6 +138,7 @@ Call `await db.close()` during shutdown to release the connection.
 
 ```typescript
 import type { Middleware } from "remix/router";
+
 import { Database } from "remix/data-table";
 
 export function loadDatabase(): Middleware {
@@ -279,8 +279,8 @@ Use `remix/data-schema/form-data` to validate `FormData` directly:
 
 ```typescript
 import * as s from "remix/data-schema";
-import * as f from "remix/data-schema/form-data";
 import { email, minLength } from "remix/data-schema/checks";
+import * as f from "remix/data-schema/form-data";
 
 let signupSchema = f.object({
     name: f.field(s.string().pipe(minLength(1))),

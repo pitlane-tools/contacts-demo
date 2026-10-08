@@ -1,8 +1,9 @@
 import type { Handle } from "remix/component";
 
+import { clientEntry, on } from "remix/component";
+
 import { routes } from "#/routes.ts";
 import { RestfulForm } from "#/ui/restful-form.tsx";
-import { clientEntry, on } from "remix/component";
 
 export let FavoriteButton = clientEntry(
     import.meta.url,

@@ -1,6 +1,7 @@
-import { DeleteButton } from "#/actions/contacts/delete-button.tsx";
 import { render } from "remix/component/test";
 import { afterEach, describe, expect, it, onTestFinished, vi } from "vitest";
+
+import { DeleteButton } from "#/actions/contacts/delete-button.tsx";
 
 function deleteForm() {
     let result = render(<DeleteButton contactId={7} />);

@@ -5,12 +5,7 @@
         "lib": ["DOM", "DOM.Iterable", "ESNext"],
         "target": "ESNext",
         "module": "ESNext",
-        "types": [
-            "@types/node",
-            "vite-plus/client",
-            "@pitlane/dev/assets",
-            "@cloudflare/vitest-plugin/types"
-        ],
+        "types": ["@types/node", "vite-plus/client", "@cloudflare/vitest-plugin/types"],
         "moduleResolution": "bundler",
         "jsx": "react-jsx",
         "jsxImportSource": "remix/component",

@@ -141,8 +141,10 @@ Create `app/utils/metadata/rules.test.ts`:
 ```ts
 import assert from "remix/assert";
 import { describe, it } from "remix/test";
-import { deriveEntryKey, getEntryLifecycle, isSupportedEntry, normalizeEntry } from "./rules";
+
 import type { MetadataEntry } from "./types";
+
+import { deriveEntryKey, getEntryLifecycle, isSupportedEntry, normalizeEntry } from "./rules";
 
 function entry(type: MetadataEntry["type"], props: MetadataEntry["props"] = {}): MetadataEntry {
     return { type, props };
@@ -479,8 +481,10 @@ Create `app/utils/metadata/html.test.ts`:
 ```ts
 import assert from "remix/assert";
 import { describe, it } from "remix/test";
-import { renderHeadEntriesToHtml, renderHeadEntryToHtml } from "./html";
+
 import type { NormalizedMetadataEntry } from "./types";
+
+import { renderHeadEntriesToHtml, renderHeadEntryToHtml } from "./html";
 
 function normalized(
     entry: Omit<NormalizedMetadataEntry, "owner" | "lifecycle"> & {
@@ -564,8 +568,9 @@ Expected: FAIL because `./html` does not exist.
 Create `app/utils/metadata/html.ts`:
 
 ```ts
-import { getPrecedence, isResourceHint } from "./rules";
 import type { NormalizedMetadataEntry } from "./types";
+
+import { getPrecedence, isResourceHint } from "./rules";
 
 const VOID_ELEMENTS = new Set(["meta", "link"]);
 
@@ -755,6 +760,7 @@ Create `app/utils/metadata/transport.test.ts`:
 ```ts
 import assert from "remix/assert";
 import { describe, it } from "remix/test";
+
 import {
     createTransportHtml,
     extractTransportTemplates,
@@ -976,6 +982,7 @@ import assert from "remix/assert";
 import { describe, it } from "remix/test";
 import { createElement, type RemixElement } from "remix/ui";
 import { renderToString } from "remix/ui/server";
+
 import { Head, entriesFromHeadChildren } from "./head";
 import { extractTransportTemplates } from "./transport";
 
@@ -1048,8 +1055,10 @@ Create `app/utils/metadata/head.tsx`:
 // @jsxRuntime classic
 // @jsx createElement
 import { createElement, type Handle, type RemixNode } from "remix/ui";
-import { createTransportHtml } from "./transport";
+
 import type { MetadataElementType, MetadataEntry, MetadataProps } from "./types";
+
+import { createTransportHtml } from "./transport";
 
 export interface HeadProps {
     children?: RemixNode;
@@ -1251,6 +1260,7 @@ Create `app/utils/metadata/ssr.test.ts`:
 ```ts
 import assert from "remix/assert";
 import { describe, it } from "remix/test";
+
 import { collectNormalizedEntriesFromHtml, injectMetadataIntoHtml } from "./ssr";
 import { createTransportHtml } from "./transport";
 
@@ -1313,10 +1323,11 @@ Expected: FAIL because `./ssr` does not exist.
 Create `app/utils/metadata/ssr.ts`:
 
 ```ts
+import type { MetadataManagerOptions, NormalizedMetadataEntry } from "./types";
+
 import { renderHeadEntriesToHtml } from "./html";
 import { normalizeEntry } from "./rules";
 import { extractTransportTemplates } from "./transport";
-import type { MetadataManagerOptions, NormalizedMetadataEntry } from "./types";
 
 export function collectNormalizedEntriesFromHtml(html: string): NormalizedMetadataEntry[] {
     let entries: NormalizedMetadataEntry[] = [];
@@ -1396,6 +1407,7 @@ Create `app/utils/metadata/stream.test.ts`:
 ```ts
 import assert from "remix/assert";
 import { describe, it } from "remix/test";
+
 import { renderWithMetadata, stringToStream, streamToString } from "./stream";
 import { createTransportHtml } from "./transport";
 
@@ -1437,8 +1449,9 @@ Expected: FAIL because `./stream` does not exist.
 Create `app/utils/metadata/stream.ts`:
 
 ```ts
-import { injectMetadataIntoHtml } from "./ssr";
 import type { MetadataManagerOptions } from "./types";
+
+import { injectMetadataIntoHtml } from "./ssr";
 
 export function stringToStream(value: string): ReadableStream<Uint8Array> {
     let encoder = new TextEncoder();
@@ -1520,6 +1533,7 @@ Create `app/utils/metadata/manager.test.ts`:
 ```ts
 import assert from "remix/assert";
 import { describe, it } from "remix/test";
+
 import { MetadataManager } from "./manager";
 import { createTransportHtml } from "./transport";
 
@@ -1643,9 +1657,10 @@ Expected: FAIL because `./manager` does not exist.
 Create `app/utils/metadata/manager.ts`:
 
 ```ts
+import type { MetadataManagerOptions, NormalizedMetadataEntry } from "./types";
+
 import { dedupeEntries, renderHeadEntryToHtml } from "./html";
 import { normalizeEntry } from "./rules";
-import type { MetadataManagerOptions, NormalizedMetadataEntry } from "./types";
 
 interface ExistingManagedNode {
     node: Element;
@@ -1864,6 +1879,7 @@ Create `app/utils/metadata/frames.test.ts`:
 ```ts
 import assert from "remix/assert";
 import { describe, it } from "remix/test";
+
 import { normalizeFrameHtml, withMetadataFrames } from "./frames";
 import { streamToString, stringToStream } from "./stream";
 
@@ -1994,6 +2010,7 @@ import assert from "remix/assert";
 import { describe, it } from "remix/test";
 import { createElement, type Handle, type RemixNode } from "remix/ui";
 import { renderToString } from "remix/ui/server";
+
 import { Head, createMetadataManager, injectMetadataIntoHtml } from "./index";
 
 function Layout(handle: Handle<{ children?: RemixNode }>) {
@@ -2145,6 +2162,7 @@ Wrap `renderToStream()` with `renderWithMetadata()`:
 
 ```tsx
 import { renderToStream } from "remix/ui/server";
+
 import { renderWithMetadata, withMetadataFrames } from "~/utils/metadata";
 
 export async function render(request: Request) {
@@ -2183,6 +2201,7 @@ Hydrate the metadata manager before or near Remix UI runtime startup:
 
 ```ts
 import { run } from "remix/ui";
+
 import { createMetadataManager, withMetadataFrames } from "~/utils/metadata";
 
 let metadata = createMetadataManager({

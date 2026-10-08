@@ -1,5 +1,5 @@
-import { generateD1Migrations } from "@pitlane/data-table-d1/migrations";
 import path from "node:path";
+import { generateD1Migrations } from "pitlane/data-table-d1/migrations";
 
 import { parseWranglerConfig } from "./lib/wrangler-config.ts";
 

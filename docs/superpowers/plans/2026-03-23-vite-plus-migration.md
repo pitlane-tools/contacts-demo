@@ -121,9 +121,10 @@ git commit -m "Add Vite+ dependencies, remove esbuild/tsx"
 - [ ] **Step 1: Create `remix.plugin.ts`**
 
 ```ts
-import fullstack from "@hiogawa/vite-plugin-fullstack";
 import type { Program } from "oxc-parser";
 import type { PluginOption } from "vite-plus";
+
+import fullstack from "@hiogawa/vite-plugin-fullstack";
 
 export function remix({
     serverEnvironments: _environments = ["ssr"],
@@ -235,8 +236,9 @@ git commit -m "Add Remix Vite plugin for clientEntry transforms"
 - [ ] **Step 1: Create `vite.config.ts`**
 
 ```ts
-import { remix } from "./remix.plugin.ts";
 import { defineConfig } from "vite-plus";
+
+import { remix } from "./remix.plugin.ts";
 
 export default defineConfig({
     resolve: {
@@ -539,9 +541,10 @@ import { mergeAssets } from "@hiogawa/vite-plugin-fullstack/runtime";
 import { getContext } from "remix/async-context-middleware";
 import { Frame } from "remix/component";
 import * as s from "remix/data-schema";
+
 import { NewButton } from "~/assets/Buttons.tsx";
-import { SearchBar } from "~/assets/SearchBar.tsx";
 import clientAssets from "~/assets/entry.tsx?assets=client";
+import { SearchBar } from "~/assets/SearchBar.tsx";
 import serverAssets from "~/entry.server.tsx?assets=ssr";
 import { QuerySchema } from "~/lib/schemas.ts";
 import styles from "~/styles/index.css?url";
@@ -782,8 +785,9 @@ If any fixes were needed during verification, commit them.
 Add `fmt` and `lint` blocks. Remove the `run.tasks.typecheck` block. The full file becomes:
 
 ```ts
-import { remix } from "./remix.plugin.ts";
 import { defineConfig } from "vite-plus";
+
+import { remix } from "./remix.plugin.ts";
 
 export default defineConfig({
     resolve: {

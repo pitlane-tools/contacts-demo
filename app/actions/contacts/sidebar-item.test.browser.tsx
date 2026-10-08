@@ -1,6 +1,7 @@
-import { SidebarItem } from "#/actions/contacts/sidebar-item.tsx";
 import { render } from "remix/component/test";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
+
+import { SidebarItem } from "#/actions/contacts/sidebar-item.tsx";
 
 // `pending-navigation.ts` subscribes to the Navigation API at module scope,
 // which jsdom does not implement. Mocking this one app-owned seam lets the

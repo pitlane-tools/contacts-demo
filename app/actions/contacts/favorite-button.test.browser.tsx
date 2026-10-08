@@ -1,6 +1,7 @@
-import { FavoriteButton } from "#/actions/contacts/favorite-button.tsx";
-import { render } from "remix/ui/test";
+import { render } from "remix/component/test";
 import { describe, expect, it, onTestFinished } from "vitest";
+
+import { FavoriteButton } from "#/actions/contacts/favorite-button.tsx";
 
 describe("FavoriteButton", () => {
     it("shows the current state but submits the desired one", () => {

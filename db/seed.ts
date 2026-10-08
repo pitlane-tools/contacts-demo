@@ -1,6 +1,7 @@
-import { Contacts } from "#/data/contacts.ts";
-import { createD1Database } from "@pitlane/data-table-d1";
+import { createD1Database } from "pitlane/data-table-d1";
 import { getPlatformProxy } from "wrangler";
+
+import { Contacts } from "#/data/contacts.ts";
 
 // Seeds the local D1 with demo contacts. Idempotent: skips when the
 // `contacts` table already has rows. Schema migrations are applied

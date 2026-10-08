@@ -6,16 +6,15 @@
         "#/*": "./app/*"
     },
     "dependencies": {
-        "@pitlane/data-table-d1": "^0.2.0",
         "@std/jsonc": "jsr:^1.0.2",
         "es-toolkit": "^1.45.1",
         "match-sorter": "^8.2.0",
-        "remix": "3.0.0-rc.3"
+        "pitlane": "^1.0.0-alpha.2",
+        "remix": "3.0.0"
     },
     "devDependencies": {
         "@cloudflare/vite-plugin": "^1.31.0",
         "@cloudflare/vitest-plugin": "^1.1.13",
-        "@pitlane/dev": "^0.6.0",
         "@types/node": "^25.5.0",
         "eslint-plugin-perfectionist": "^5.8.0",
         "eslint-plugin-prefer-let": "^4.2.2",

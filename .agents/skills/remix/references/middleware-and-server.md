@@ -22,14 +22,14 @@ request-enriching middleware (session, auth) later.
 Recommended ordering:
 
 ```typescript
-import { createRouter } from "remix/router";
+import { asyncContext } from "remix/middleware/async-context";
 import { compression } from "remix/middleware/compression";
 import { formData } from "remix/middleware/form-data";
 import { logger } from "remix/middleware/logger";
 import { methodOverride } from "remix/middleware/method-override";
 import { session } from "remix/middleware/session";
 import { staticFiles } from "remix/middleware/static";
-import { asyncContext } from "remix/middleware/async-context";
+import { createRouter } from "remix/router";
 
 let middleware = [];
 
@@ -103,8 +103,8 @@ staticFiles("./public", {
 });
 
 // Form data with upload handler
-import { FileUpload } from "remix/form-data-parser";
 import { createFsFileStorage } from "remix/file-storage/fs";
+import { FileUpload } from "remix/form-data-parser";
 
 let fileStorage = createFsFileStorage("./tmp/uploads");
 
@@ -129,6 +129,7 @@ Use `context.set(key, value)` to add typed values accessible downstream via `con
 
 ```typescript
 import type { Middleware } from "remix/router";
+
 import { Database } from "remix/data-table";
 
 export function loadDatabase(): Middleware {
@@ -163,9 +164,9 @@ helpers:
 
 ```typescript
 // app/utils/context.ts
+import { Database } from "remix/data-table";
 import { getContext } from "remix/middleware/async-context";
 import { Auth } from "remix/middleware/auth";
-import { Database } from "remix/data-table";
 import { Session } from "remix/session";
 
 export function getCurrentDb() {

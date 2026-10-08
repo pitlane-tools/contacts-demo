@@ -1,7 +1,7 @@
 /**
  * Destination of the in-flight navigation, if any.
  *
- * `remix/ui` has no app-wide navigation bus by design — per-region pending UI
+ * `remix/component` has no app-wide navigation bus by design — per-region pending UI
  * is built from a frame's own `reloadStart`/`reloadComplete` events, and a
  * caller that triggers a navigation itself can just await `navigate()`.
  *

@@ -1,5 +1,6 @@
-import { frameTarget } from "#/utils/frames.ts";
 import { describe, expect, it } from "vitest";
+
+import { frameTarget } from "#/utils/frames.ts";
 
 describe("frameTarget", () => {
     it("reads the target of a frame request", () => {

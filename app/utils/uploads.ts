@@ -1,9 +1,10 @@
 import type { FileUpload } from "remix/form-data-parser";
 
+import { env } from "cloudflare:workers";
+
 import { R2FileStorage } from "#/data/adapters/r2-file-storage.ts";
 import { routes } from "#/routes.ts";
 import { imageExtension } from "#/utils/image-types.ts";
-import { env } from "cloudflare:workers";
 
 export let uploadStorage = new R2FileStorage(env.FILES);
 

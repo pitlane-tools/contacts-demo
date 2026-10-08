@@ -7,8 +7,8 @@ Create interactive UIs with Remix UI using a two-phase component model: setup ru
 To start using Remix UI on the client, create a root and render your top-level component:
 
 ```tsx
-import { createRoot } from 'remix/ui'
-import type { Handle } from 'remix/ui'
+import { createRoot } from 'remix/component'
+import type { Handle } from 'remix/component'
 
 function App(handle: Handle) {
   return () => (
@@ -83,7 +83,7 @@ For a server-rendered app, define your page as a component, install the standard
 ```tsx
 import { render } from 'remix/middleware/render'
 import { createRouter } from 'remix/router'
-import { Frame } from 'remix/ui'
+import { Frame } from 'remix/component'
 import { Counter } from './assets/counter.tsx'
 
 function App() {
@@ -112,7 +112,7 @@ router.get('/sidebar', (context) => context.render(<nav>Sidebar</nav>))
 
 ```tsx
 // assets/entry.tsx
-import { run } from 'remix/ui'
+import { run } from 'remix/component'
 
 let app = run({
   async loadModule(moduleUrl, exportName) {
@@ -132,7 +132,7 @@ policy. Add `data-rmx-document` to a link or form to leave its navigation to the
 
 ```tsx
 // assets/counter.tsx
-import { clientEntry, on, type Handle } from 'remix/ui'
+import { clientEntry, on, type Handle } from 'remix/component'
 
 export let Counter = clientEntry(
   '/assets/counter.js#Counter',

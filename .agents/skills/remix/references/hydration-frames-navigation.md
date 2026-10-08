@@ -50,7 +50,7 @@ source module's `import.meta.url` as the entry ID and let server rendering map i
 asset URL:
 
 ```tsx
-import { clientEntry, on, type Handle } from "remix/ui";
+import { clientEntry, on, type Handle } from "remix/component";
 
 export const Counter = clientEntry(
     import.meta.url,
@@ -113,7 +113,7 @@ Use `run` to start the client runtime. It scans the document for client entry ma
 modules, and hydrates each one:
 
 ```tsx
-import { run } from "remix/ui";
+import { run } from "remix/component";
 
 let app = run({
     async loadModule(moduleUrl, exportName) {
@@ -156,7 +156,7 @@ A `<Frame>` renders server content into the page. Frames stream after the initia
 other frames, contain client entries, and can be reloaded without full page navigation.
 
 ```tsx
-import { Frame } from "remix/ui";
+import { Frame } from "remix/component";
 
 function App() {
     return () => (
@@ -214,7 +214,7 @@ Renders a component tree to a `ReadableStream<Uint8Array>`. Sends initial HTML i
 streams frame content as it resolves:
 
 ```tsx
-import { renderToStream } from "remix/ui/server";
+import { renderToStream } from "remix/component/server";
 
 let stream = renderToStream(<App />, {
     frameSrc: request.url,
@@ -247,7 +247,7 @@ Options:
 Renders a component tree to a complete HTML string. Use for static pages or embedding HTML:
 
 ```tsx
-import { renderToString } from "remix/ui/server";
+import { renderToString } from "remix/component/server";
 let html = await renderToString(<App />);
 ```
 
@@ -264,7 +264,7 @@ Use real anchors for normal document navigation. For app-driven navigation:
 - `link(href, options?)` mixin — makes any element behave like a navigation link
 
 ```tsx
-import { navigate } from "remix/ui";
+import { navigate } from "remix/component";
 navigate("/dashboard", { history: "replace" });
 ```
 

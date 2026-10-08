@@ -1,5 +1,6 @@
-import { ALLOWED_TYPES, imageExtension } from "#/utils/image-types.ts";
 import { describe, expect, it } from "vitest";
+
+import { ALLOWED_TYPES, imageExtension } from "#/utils/image-types.ts";
 
 const SAMPLES: Record<string, string> = {
     "image/avif": "photo.avif",

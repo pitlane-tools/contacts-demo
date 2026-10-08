@@ -1,5 +1,5 @@
+import type { Handle } from "remix/component";
 import type { RequestMethod } from "remix/router";
-import type { Handle } from "remix/ui";
 
 export function RestfulForm(
     handle: Handle<JSX.IntrinsicHTMLElements["form"] & { method?: RequestMethod | "ANY" }>,

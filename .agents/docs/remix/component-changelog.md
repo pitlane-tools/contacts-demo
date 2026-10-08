@@ -19,8 +19,8 @@ Historical examples below may show legacy component APIs from the release being 
   For example:
 
   ```ts
-  import type { RemixNode } from 'remix/ui'
-  import { renderToStream } from 'remix/ui/server'
+  import type { RemixNode } from 'remix/component'
+  import { renderToStream } from 'remix/component/server'
 
   import { resolveEntryId } from './resolve-entry-id.ts'
 

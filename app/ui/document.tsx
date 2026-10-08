@@ -1,16 +1,14 @@
-import type { Handle } from "remix/ui";
+import type { Handle } from "remix/component";
 
+import { Frame } from "remix/component";
+import { ImportMap } from "remix/component/server";
+import { getContext } from "remix/middleware/async-context";
+
+import { indexStylesheetHref, scriptEntry, stylesheets } from "#/assets.ts";
 import { SITE } from "#/data/meta.ts";
 import { searchQuery } from "#/data/schemas.ts";
-import clientAssets from "#/entry.browser.tsx?assets=client";
-import serverAssets from "#/entry.server.tsx?assets=ssr";
-import styles from "#/index.css?url";
 import { routes } from "#/routes.ts";
 import { SearchBar } from "#/ui/search-bar.tsx";
-import { mergeAssets } from "@pitlane/dev/runtime";
-import { HMR } from "pitlane:dev";
-import { getContext } from "remix/middleware/async-context";
-import { Frame } from "remix/ui";
 
 import { RestfulForm } from "./restful-form.tsx";
 
@@ -24,7 +22,6 @@ export namespace Document {
 export function Document(handle: Handle<Document.Props>) {
     let { url } = getContext();
     let q = searchQuery(url);
-    let { css, js } = mergeAssets(clientAssets, serverAssets);
 
     return () => (
         <html lang="en">
@@ -41,18 +38,18 @@ export function Document(handle: Handle<Document.Props>) {
                 <link href="/favicon.svg" rel="icon" sizes="any" type="image/svg+xml" />
                 <link href="/favicon-180.png" rel="apple-touch-icon" sizes="180x180" />
 
-                <link href={styles} rel="stylesheet" />
-                {css.map(attrs => (
-                    <link key={attrs.href} {...attrs} rel="stylesheet" />
+                <link href={indexStylesheetHref} rel="stylesheet" />
+                {stylesheets.map(href => (
+                    <link href={href} key={href} rel="stylesheet" />
                 ))}
 
-                <script async src={clientAssets.entry} type="module" />
-                {js.map(attrs => (
-                    <link key={attrs.href} {...attrs} rel="modulepreload" />
+                <ImportMap value={scriptEntry.importMap} />
+                {scriptEntry.preloads.map(href => (
+                    <link href={href} key={href} rel="modulepreload" />
                 ))}
+                <script async src={scriptEntry.href} type="module" />
             </head>
             <body>
-                <HMR />
                 <div id="root">
                     <div id="sidebar">
                         <h1>{SITE.title}</h1>

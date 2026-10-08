@@ -1,4 +1,4 @@
-import { clientEntry, type Handle, navigate, on } from "remix/ui";
+import { clientEntry, type Handle, navigate, on } from "remix/component";
 
 export let SearchBar = clientEntry(import.meta.url, (handle: Handle<{ query?: string }>) => {
     // `navigate()` settles when the targeted frame has finished swapping, so

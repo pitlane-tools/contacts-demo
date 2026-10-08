@@ -23,7 +23,7 @@ A component has two phases:
 2. **Render phase** — returned function runs on initial render and every update
 
 ```tsx
-import { on, type Handle } from "remix/ui";
+import { on, type Handle } from "remix/component";
 
 function Counter(handle: Handle<{ initialCount?: number; label: string }>) {
     let count = handle.props.initialCount ?? 0;
@@ -221,7 +221,7 @@ function ThemedContent(handle: Handle) {
 For granular updates without re-rendering the full subtree, use `TypedEventTarget`:
 
 ```tsx
-import { TypedEventTarget } from "remix/ui";
+import { TypedEventTarget } from "remix/component";
 
 class Theme extends TypedEventTarget<{ change: Event }> {
     #value: "light" | "dark" = "light";
@@ -264,7 +264,7 @@ browser-only setup with `handle.queueTask()` and pass `handle.signal` so the lis
 when the component disconnects:
 
 ```tsx
-import type { Handle } from "remix/ui";
+import type { Handle } from "remix/component";
 
 function ResizeTracker(handle: Handle) {
     let width: number | undefined;

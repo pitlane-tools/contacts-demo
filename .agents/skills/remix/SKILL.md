@@ -20,7 +20,7 @@ A Remix app has four main pieces:
 - **Controllers and actions** implement that contract and return `Response` objects.
 - **Middleware** composes request lifecycle behavior and populates typed context via
   `context.set(Key, value)`.
-- **Components** render UI with `remix/ui`. This is not React. A component receives a
+- **Components** render UI with `remix/component`. This is not React. A component receives a
   `handle`, reads current props from `handle.props`, and returns a render function.
 
 ## When To Use This Skill
@@ -242,7 +242,7 @@ what it exports. Open the linked reference file when you need full examples.
 - `remix/response/redirect` — `redirect(href, status?)`. Use for the canonical "POST then redirect"
   pattern and other location changes
 - `remix/response/html` — `createHtmlResponse`. Use when you need an HTML `Response` from a string
-  or stream without rendering through `remix/ui`
+  or stream without rendering through `remix/component`
 - `remix/response/compress` — `compressResponse`. Use when compressing one-off responses outside
   the global `compression()` middleware
 - `remix/response/file` — file-download responses. Use for `Content-Disposition: attachment`
@@ -301,16 +301,18 @@ what it exports. Open the linked reference file when you need full examples.
 
 ### UI, Hydration, and Browser Behavior
 
-- `remix/ui` — the component runtime: components, core mixins, `clientEntry`, `run`, `<Frame>`,
-  navigation helpers, and `createRoot`. Use for app UI behavior
-- `remix/ui/server` — server rendering: `renderToStream`, `renderToString`. Use in the
+- `remix/component` — the component runtime: components, core mixins, `clientEntry`, `run`,
+  `<Frame>`, navigation helpers, and `createRoot`. Use for app UI behavior
+- `remix/component/server` — server rendering: `renderToStream`, `renderToString`. Use in the
   `render(...)` helper that returns HTML responses
-- `remix/ui/animation` — animation APIs: `animateEntrance`, `animateExit`, `animateLayout`,
-  `spring`, `tween`, and `easings`
-- `remix/ui/<primitive>` — UI primitives, mixins, glyphs, and theme helpers. Import from
-  `remix/ui/accordion`, `remix/ui/button`, `remix/ui/select`, etc.
-- `remix/ui/test` — component test rendering helpers such as `render`
-- `remix/ui/jsx-runtime` — JSX transform target. Configured in `tsconfig.json`, rarely
+- `@remix-run/ui/animation` — animation APIs: `animateEntrance`, `animateExit`, `animateLayout`,
+  `spring`, `tween`, and `easings`. Ships in the separate `@remix-run/ui` package; install it
+  before importing
+- `@remix-run/ui/<primitive>` — headless behavior primitives, in the same separate package.
+  Import from `@remix-run/ui/accordion`, `@remix-run/ui/select`, etc. There are no styled
+  components: build the markup and styles yourself on top of the primitive
+- `remix/component/test` — component test rendering helpers such as `render`
+- `remix/component/jsx-runtime` — JSX transform target. Configured in `tsconfig.json`, rarely
   imported directly
 - `remix/html-template` — escaped HTML template literals. Use when generating HTML outside the
   component system (RSS feeds, email bodies, error pages)
@@ -484,7 +486,7 @@ This shape works without JavaScript, returns a `Response` for every outcome, and
 ### Build UI from handle props plus render
 
 ```tsx
-import { on, type Handle } from "remix/ui";
+import { on, type Handle } from "remix/component";
 
 function Counter(handle: Handle<{ initialCount?: number; label: string }>) {
     let count = handle.props.initialCount ?? 0;

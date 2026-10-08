@@ -1,7 +1,9 @@
-import type { Handle } from "remix/ui";
+import type { Handle } from "remix/component";
+
+import { revalidate } from "pitlane/vite-plugin-remix/hmr";
+import { createRoot, on, run } from "remix/component";
 
 import { applyPageMetadata } from "#/utils/page-metadata.ts";
-import { createRoot, on, run } from "remix/ui";
 
 let app = run({
     async loadModule(moduleUrl, exportName) {
@@ -48,6 +50,11 @@ let app = run({
     },
 });
 
+// Server-only edits in `vite dev` revalidate the page in place.
+if (import.meta.hot) {
+    import.meta.hot.on("server:update", () => revalidate(app));
+}
+
 // Global error boundary — renders a dismissible banner for any error dispatched
 // on the app runtime, including failed frame navigations and submissions.
 let bannerHost = document.createElement("div");
@@ -76,7 +83,7 @@ app.addEventListener("error", event => {
 });
 
 // Must be registered after `run` (last intercept() call wins for focusReset).
-// `remix/ui` never sets focusReset, so preserving focus across an enhanced
+// `remix/component` never sets focusReset, so preserving focus across an enhanced
 // navigation — the search input keeping focus while results stream in — is
 // still the app's job.
 navigation.addEventListener("navigate", event => {

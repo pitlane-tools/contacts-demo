@@ -60,7 +60,7 @@ wrangler.jsonc           # Cloudflare bindings (D1, R2, assets)
 
 **No `public/` directories inside `app/`.** (The repo root still has one — Vite's static directory, copied into `dist/client` at build time. Different thing.) Upstream colocates `clientEntry()` components under `app/**/public/**`, but that is not a stylistic convention: it is the allowlist `remix/assets`' asset server matches when deciding which source files it may compile and serve. The guides call `allowFiles` "a security boundary, not merely compilation configuration". This app bundles with Vite, which resolves the browser module graph from the `clientEntry()` calls themselves, so such a directory would allowlist nothing and buy nothing. Hydrated components sit beside their server-only siblings, and `clientEntry()` in the source is the marker that a component crosses the network boundary.
 
-**Why `entry.server.tsx` and not `router.ts`:** upstream names the server module `router.ts`. This app can't, for two reasons. It is the value of `main` in `wrangler.jsonc` (`"./app/entry.server.tsx"`), so it is the Cloudflare Workers module entry, and `app/ui/document.tsx` imports `#/entry.server.tsx?assets=ssr` to collect the SSR asset graph. The name is load-bearing in both places.
+**Why `entry.server.tsx` and not `router.ts`:** upstream names the server module `router.ts`. This app can't, for two reasons. It is the value of `main` in `wrangler.jsonc` (`"./app/entry.server.tsx"`), so it is the Cloudflare Workers module entry, and `app/assets.ts` calls `assets.getStylesheets("app/entry.server.tsx")` to collect the SSR stylesheets. The name is load-bearing in both places.
 
 **Imports:** `#/` (from `package.json#imports`) for anything outside the current directory; plain relative imports only for same-directory siblings — `app/actions/controller.tsx` imports `./sidebar.tsx`, and `app/ui/document.tsx` imports `./restful-form.tsx`. See Recipe 36.
 
@@ -133,17 +133,17 @@ export let LikeButton = clientEntry(
 
 **Important:** All props passed to a `clientEntry` component must be serializable (strings, numbers, booleans, plain objects, arrays). The server serializes them as JSON for the client to hydrate. You cannot pass functions, class instances, or DOM nodes as props to hydrated components.
 
-**Why `import.meta.url`, and why you must not simplify it away.** Upstream passes it so its asset server can map a `file:` URL to a compiled, served module — `clientEntry`'s documented default is really `"/js/module.js#ExportName"` (`ui/src/runtime/client-entries.ts:56`). Here it is a _transform marker_: `@pitlane/dev` matches the literal `clientEntry(import.meta.url, …)` call shape and rewrites the argument at transform time. The compiled SSR bundle shows what it becomes:
+**Why `import.meta.url`, and why you must not simplify it away.** Upstream passes it so its asset server can map a `file:` URL to a compiled, served module — `clientEntry`'s documented default is really `"/js/module.js#ExportName"` (`ui/src/runtime/client-entries.ts:56`). Here it is a _transform marker_: `@pitlane/vite-plugin-remix` matches the literal `clientEntry(import.meta.url, …)` call shape and rewrites the argument at transform time to a portable, project-relative entry ID. The compiled SSR bundle shows what it becomes:
 
 ```js
-clientEntry(mergeAssets(__assets_manifest["client"]["app/actions/contacts/favorite-button.tsx"]).entry + "#FavoriteButton", …)
+clientEntry("file:app/actions/contacts/favorite-button.tsx#FavoriteButton", …)
 ```
 
-So the renderer never sees a `file:` entry ID and never consults an asset server. Replace the argument with a string and the transform stops matching.
+`render({ assets })` in `entry.server.tsx` resolves that ID through the `@pitlane/assets` resolver from `app/assets.ts` to the built chunk URL, and emits `modulepreload` links for the island. Replace the argument with a string and the transform stops matching; drop `assets` from `render()` and the first island render fails.
 
 **A failed hydration is silent.** `frame.ts:1323-1325` catches every client-entry load failure, logs `[createFrame] Failed to load module`, and returns `undefined` — it does not dispatch the runtime `error` event and does not reject `ready()`, so the app's error banner never fires. A broken island therefore degrades to its server-rendered markup. That is the right default, but it only helps if the markup works on its own, which is the real argument for Recipe 21's no-JS favorite toggle: an island that hydrates into behavior the HTML cannot express fails invisibly.
 
-**Deliberately omitted.** Every upstream demo's browser entry also installs `processClientEntryPreloads` and routes `loadModule` through `remix/multiple-import-maps-polyfill`. Both exist solely to cope with import maps added after the initial document — the demos use the hook for nothing but `detectMultipleImportMapSupport()`. A Vite bundle has no import maps at all, so this app uses plain `import()` and sets no hook. The demos' `app.ready().catch(…)` is skipped too: `run()` already dispatches the error itself (`run.ts:167-170`), and the only rejection paths are sub-frame and pending-template failures, which cannot occur in a document where `render()` fills both frames server-side.
+**Deliberately omitted.** Every upstream demo's browser entry also installs `processClientEntryPreloads` and routes `loadModule` through `remix/multiple-import-maps-polyfill`. Both exist solely to cope with import maps added after the initial document — the demos use the hook for nothing but `detectMultipleImportMapSupport()`. This app's only import map is the chunk import map the document renders once in `<head>` (`<ImportMap value={scriptEntry.importMap} />`), so it uses plain `import()` and sets no hook. The demos' `app.ready().catch(…)` is skipped too: `run()` already dispatches the error itself (`run.ts:167-170`), and the only rejection paths are sub-frame and pending-template failures, which cannot occur in a document where `render()` fills both frames server-side.
 
 ---
 
@@ -151,7 +151,7 @@ So the renderer never sees a `file:` entry ID and never consults an asset server
 
 **Decision:** Does this form need any JavaScript, or can the runtime drive it?
 
-**Heuristic:** Write the plain form first and stop there. `run()` from `remix/ui` already intercepts form submissions — GET _and_ POST — and routes them through frame reloads, so an ordinary `<form>` is already a client-side, frame-targeted submission with zero application code. Add a handler only when you need one of:
+**Heuristic:** Write the plain form first and stop there. `run()` from `remix/component` already intercepts form submissions — GET _and_ POST — and routes them through frame reloads, so an ordinary `<form>` is already a client-side, frame-targeted submission with zero application code. Add a handler only when you need one of:
 
 - A pre-submission guard (confirmation dialog) — an `on("submit")` listener that may `preventDefault()`.
 - Optimistic UI (show the result before the server responds) — a hand-driven `fetch()`.
@@ -292,8 +292,8 @@ This is **not** how ordinary POSTs work anymore — it is the optimism escape ha
 **Method override for PUT/PATCH/DELETE:** HTML forms only support GET and POST. For other HTTP methods, use a hidden `_method` field with the `methodOverride()` middleware. `app/ui/restful-form.tsx` wraps the pattern so no form repeats the boilerplate:
 
 ```tsx
+import type { Handle } from "remix/component";
 import type { RequestMethod } from "remix/router";
-import type { Handle } from "remix/ui";
 
 export function RestfulForm(
     handle: Handle<JSX.IntrinsicHTMLElements["form"] & { method?: RequestMethod | "ANY" }>,
@@ -455,7 +455,7 @@ export let FavoriteButton = clientEntry(
 **The pattern** (`app/ui/search-bar.tsx`, in full):
 
 ```tsx
-import { clientEntry, type Handle, navigate, on } from "remix/ui";
+import { clientEntry, type Handle, navigate, on } from "remix/component";
 
 export let SearchBar = clientEntry(import.meta.url, (handle: Handle<{ query?: string }>) => {
     // `navigate()` settles when the targeted frame has finished swapping, so
@@ -532,7 +532,7 @@ export let SearchBar = clientEntry(import.meta.url, (handle: Handle<{ query?: st
 
 **Why `try/catch` around every `navigate`:** rapid typing means each call aborts the previous one, and the aborted transition rejects. Catching keeps those expected rejections from surfacing as unhandled rejections — and, in this app, from reaching the global `error` banner wired up in `app/entry.browser.tsx`.
 
-**Why focus survives:** `app/entry.browser.tsx` registers a `navigate` listener _after_ `run()` that calls `event.intercept({ focusReset: "manual" })`. `remix/ui` never sets `focusReset`, so without that the input would lose focus on each swap.
+**Why focus survives:** `app/entry.browser.tsx` registers a `navigate` listener _after_ `run()` that calls `event.intercept({ focusReset: "manual" })`. `remix/component` never sets `focusReset`, so without that the input would lose focus on each swap.
 
 ---
 
@@ -552,7 +552,6 @@ Not every app needs frames. A simple single-column page that always renders as a
 
 ```tsx
 <body>
-    <HMR />
     <div id="root">
         <div id="sidebar">
             <h1>{SITE.title}</h1>
@@ -711,16 +710,18 @@ router.map(routes.posts, postsController); // Maps all sub-routes to a controlle
 **Recommended middleware stack** (`app/entry.server.tsx`):
 
 ```tsx
-import contacts from "#/actions/contacts/controller.tsx";
-import controller from "#/actions/controller.tsx";
-import { database, uploadErrors } from "#/middleware.ts";
-import { routes } from "#/routes.ts";
-import { UPLOAD_LIMITS, uploadHandler } from "#/utils/uploads.ts";
 import { asyncContext } from "remix/middleware/async-context";
 import { formData } from "remix/middleware/form-data";
 import { methodOverride } from "remix/middleware/method-override";
 import { render } from "remix/middleware/render";
 import { createRouter, type MiddlewareContext } from "remix/router";
+
+import contacts from "#/actions/contacts/controller.tsx";
+import controller from "#/actions/controller.tsx";
+import { assets } from "#/assets.ts";
+import { database, uploadErrors } from "#/middleware.ts";
+import { routes } from "#/routes.ts";
+import { UPLOAD_LIMITS, uploadHandler } from "#/utils/uploads.ts";
 
 let middleware = [
     uploadErrors(),
@@ -729,13 +730,14 @@ let middleware = [
     asyncContext(),
     database(),
     render({
+        assets,
         onError(error) {
             console.error(error);
         },
     }),
 ] as const;
 
-declare module "remix/router" {
+declare module "remix" {
     interface RouterTypes {
         context: MiddlewareContext<typeof middleware>;
     }
@@ -788,7 +790,7 @@ async home(ctx) {
 
 It also owns everything awkward about resolving a frame's `src` on the server: it forwards the incoming request's credentials and cookies, strips hop-by-hop headers and every `sec-fetch-*` header, forces the sub-request to `GET`, follows redirects up to a limit of 20, trims headers down to a safe subset when a frame points at another origin, and cancels in-flight frame work when the client disconnects. None of that is code you write.
 
-**No `assets` option.** `render()` accepts `{ assets?, onError? }`, and this app passes neither. The `assets` server exists only to turn a `file:`-prefixed client-entry ID into a browser module URL. `@pitlane/dev`'s `clientEntryTransform` already does that at transform time: in server environments it rewrites the `import.meta.url` argument of `clientEntry(import.meta.url, …)` into `___clientEntryAssets.entry + "#ExportName"`, a public chunk URL. The entry ID the renderer sees is therefore never a `file:` URL, so it takes the pass-through branch and no asset server is consulted. Do not add `remix/assets`, `createAssetServer`, or `<ImportMap>` to a `@pitlane/dev` build — they solve a problem the transform has already solved.
+**Pass `assets`.** `render()` accepts `{ assets?, onError? }`. `@pitlane/vite-plugin-remix` rewrites the `import.meta.url` argument of `clientEntry(import.meta.url, …)` into a `file:app/…#ExportName` entry ID, and the renderer resolves that ID through the `assets` option to the built chunk URL plus its `modulepreload` hints. `app/assets.ts` builds that resolver with `createAssetResolver(manifest)` from `@pitlane/assets`; without it the first island render fails. Do not add `remix/assets` or `createAssetServer` — Vite builds and serves the modules.
 
 **Don't catch thrown `Response`s.** A generic rescue middleware that does `catch (error) { if (error instanceof Response) return error }` has no upstream precedent. `fetch-router` never catches thrown Responses — its middleware runner has no `try`/`catch` at all, and its only `instanceof Response` check is on a middleware's _return_ value. Canonical code returns a `Response`; throwing one just means the framework sees an unhandled exception. `uploadErrors()` is the shape upstream actually demonstrates: catch one real error type you own, convert it to a response.
 
@@ -828,6 +830,7 @@ A few of those rows deserve their reasoning spelled out, because the obvious alt
 
 ```tsx
 import { createController } from "remix/router";
+
 import { routes } from "#/routes.ts";
 
 export default createController(routes.posts, {
@@ -953,7 +956,7 @@ let profile = s.parse(ProfileSchema, ctx.formData);
 
 **Decision:** How do I indicate that something is loading or in-progress?
 
-**Heuristic:** `remix/ui` has **no app-wide navigation bus**, by design. Derive pending state as locally as possible: first from the navigation you yourself started, then from the frame that is actually reloading, and only as a last resort from an app-owned subscription.
+**Heuristic:** `remix/component` has **no app-wide navigation bus**, by design. Derive pending state as locally as possible: first from the navigation you yourself started, then from the frame that is actually reloading, and only as a last resort from an app-owned subscription.
 
 **Decision order:**
 
@@ -1016,10 +1019,11 @@ No component in this app currently _listens_ for these events — search owns it
 **The whole client entry:**
 
 ```tsx
-import type { Handle } from "remix/ui";
+import type { Handle } from "remix/component";
+
+import { createRoot, on, run } from "remix/component";
 
 import { applyPageMetadata } from "#/utils/page-metadata.ts";
-import { createRoot, on, run } from "remix/ui";
 
 let app = run({
     async loadModule(moduleUrl, exportName) {
@@ -1091,7 +1095,7 @@ app.addEventListener("error", event => {
 });
 
 // Must be registered after `run` (last intercept() call wins for focusReset).
-// `remix/ui` never sets focusReset, so preserving focus across an enhanced
+// `remix/component` never sets focusReset, so preserving focus across an enhanced
 // navigation — the search input keeping focus while results stream in — is
 // still the app's job.
 navigation.addEventListener("navigate", event => {
@@ -1120,7 +1124,7 @@ navigation.addEventListener("navigate", event => {
 - Call `applyPageMetadata(response.headers)` on the way out, so a `detail`-frame swap updates `document.title` and the description meta tag. See Recipe 22 for why a partial frame swap needs this and a full-document navigation does not.
 - **Return the `Response`, not `response.body`.** The runtime unwraps it: a `Response` resolution is the only shape from which it can read `redirected` and `url`, and that is the signal it uses to start a replacing navigation so the address bar matches the swapped-in content. Return a body or a string and that re-sync is silently lost — a POST that ends in a redirect leaves the submitted action URL in the address bar while the redirect target's HTML renders. (Returning the body is legal, and fine for a resolver that only ever serves GETs, but there is no reason to give up the redirect information.)
 
-**Why the `focusReset` listener must come after `run()`.** Multiple `navigate` listeners may each call `event.intercept()`; for options like `focusReset` and `scroll`, the _last_ call wins. `remix/ui` never sets `focusReset`, so the browser's default (reset focus to the document) would apply and the search input would lose focus on every keystroke-driven frame update. Registering after `run()` makes the app's `{ focusReset: "manual" }` the winning option while leaving the runtime's `handler` — the actual frame reload — intact. There is no native equivalent to opt into; this listener is the reason it stays in the entry.
+**Why the `focusReset` listener must come after `run()`.** Multiple `navigate` listeners may each call `event.intercept()`; for options like `focusReset` and `scroll`, the _last_ call wins. `remix/component` never sets `focusReset`, so the browser's default (reset focus to the document) would apply and the search input would lose focus on every keystroke-driven frame update. Registering after `run()` makes the app's `{ focusReset: "manual" }` the winning option while leaving the runtime's `handler` — the actual frame reload — intact. There is no native equivalent to opt into; this listener is the reason it stays in the entry.
 
 **Why traverse navigations are skipped.** Back/forward navigations restore frame state from the history entry inside the runtime's own listener, which sets `scroll: 'manual'` and lets the Navigation API perform its deferred scroll restoration. Adding `focusReset: "manual"` there would fight that restoration, so the app returns early for `navigationType === "traverse"`, and for events it can't intercept or that someone already prevented.
 
@@ -1188,8 +1192,8 @@ import { Database } from "remix/data-table";
 **Set it in middleware** (`app/middleware.ts`):
 
 ```tsx
-import { createD1Database } from "@pitlane/data-table-d1";
 import { env } from "cloudflare:workers";
+import { createD1Database } from "pitlane/data-table-d1";
 import { Database } from "remix/data-table";
 import { type Middleware } from "remix/router";
 
@@ -1399,7 +1403,7 @@ The runtime's anchor path reads the attributes straight off the closest `a`/`are
 
 **Submitter attributes beat form attributes.** The runtime checks the submitter first and falls back to the `<form>` for every attribute in the vocabulary — the frame-targeting analogue of `formaction`. That only matters for one form with several submit buttons that should land their responses in _different_ frames. Reach for it then, and be aware of the cost: `ButtonHTMLProps` does not declare the `data-rmx-*` attributes (only `AnchorHTMLProps` and `FormHTMLProps` do), so a button-level override needs a small `createMixin` wrapper to set them. Put the attribute on the `<form>` whenever every submitter agrees, which is almost always.
 
-Do **not** reach for `remix/ui`'s own `link()` mixin here. On a non-anchor host it applies _link_ semantics: it sets `role="link"`, forces a button's `type` to `"button"`, and navigates from a `preventDefault`ed click — which cancels the form submission entirely.
+Do **not** reach for `remix/component`'s own `link()` mixin here. On a non-anchor host it applies _link_ semantics: it sets `role="link"`, forces a button's `type` to `"button"`, and navigates from a `preventDefault`ed click — which cancels the form submission entirely.
 
 **The attribute vocabulary the runtime reads:**
 
@@ -1574,12 +1578,12 @@ drop table if exists "posts";
 >
 > Per-migration transaction behavior is set with a directive on the first non-blank line of `up.sql`: `-- data-table/transaction: none` (modes: `auto` default, `required`, `none`).
 
-**Compiling to SQL** — `generateD1Migrations` from `@pitlane/data-table-d1/migrations` reads each migration's `up.sql` and writes one Wrangler-shaped `.sql` file per migration, then deletes generated files with no migration behind them so the output directory is a pure function of the input one:
+**Compiling to SQL** — `generateD1Migrations` from `pitlane/data-table-d1/migrations` reads each migration's `up.sql` and writes one Wrangler-shaped `.sql` file per migration, then deletes generated files with no migration behind them so the output directory is a pure function of the input one:
 
 ```tsx
 // db/generate-d1-migrations.ts
-import { generateD1Migrations } from "@pitlane/data-table-d1/migrations";
 import path from "node:path";
+import { generateD1Migrations } from "pitlane/data-table-d1/migrations";
 
 import { parseWranglerConfig } from "./lib/wrangler-config.ts";
 
@@ -1602,9 +1606,10 @@ The helper copies each `up.sql` **verbatim** rather than splitting it into state
 
 ```tsx
 // db/seed.ts
-import { Posts } from "#/data/posts.ts";
-import { createD1Database } from "@pitlane/data-table-d1";
+import { createD1Database } from "pitlane/data-table-d1";
 import { getPlatformProxy } from "wrangler";
+
+import { Posts } from "#/data/posts.ts";
 
 let proxy = await getPlatformProxy<Env>({ configPath: "./wrangler.jsonc", persist: true });
 
@@ -1715,6 +1720,7 @@ The apply helper is a thin wrapper around `wrangler`:
 ```tsx
 // db/apply-d1-migrations.ts (simplified)
 import { parseArgs } from "node:util";
+
 import { buildApplyCommand, runApplyCommand } from "./lib/wrangler-cli.ts";
 import { parseWranglerConfig } from "./lib/wrangler-config.ts";
 
@@ -1873,10 +1879,9 @@ The client handles the state update optimistically and doesn't need a redirect.
 
 ```tsx
 import { cloudflare } from "@cloudflare/vite-plugin";
+import { remix } from "pitlane/vite-plugin-remix";
 import devtoolsJson from "vite-plugin-devtools-json";
 import { defineConfig } from "vite-plus";
-
-import { remix } from "@pitlane/dev";
 
 export default defineConfig({
     plugins: [
@@ -1916,7 +1921,7 @@ export default defineConfig({
                 cache: false,
             },
             typegen: {
-                input: ["wrangler.jsonc"],
+                cache: { input: ["wrangler.jsonc"] },
                 command: "wrangler types",
             },
             typecheck: {
@@ -1937,12 +1942,8 @@ export default defineConfig({
             deploy: { command: "wrangler deploy", cache: false },
         },
     },
-    fmt: {
-        /* Oxfmt options */
-    },
-    lint: {
-        /* Oxlint options */
-    },
+    fmt: {/* Oxfmt options */},
+    lint: {/* Oxlint options */},
 });
 ```
 
@@ -1954,16 +1955,17 @@ export default defineConfig({
 **Run tasks:** The `run.tasks` config defines orchestrated commands that `vp run <task>` executes. Key patterns:
 
 - **`dependsOn`:** Ensures prerequisites run first. `dev` chains `typegen` (generates `Env` types from `wrangler.jsonc`) and `db:seed` (which itself chains `db:migrations:apply:local` → `db:migrations:generate`).
-- **`input`:** File-based cache invalidation. `typegen` only reruns when `wrangler.jsonc` changes.
+- **`cache.input`:** File-based cache invalidation. `typegen` only reruns when `wrangler.jsonc` changes.
 - **`cache: false`:** Disables caching for tasks that should always run (typecheck, deploy, migrations).
 - **`db:reset`:** Deletes local D1 state for a clean slate during development.
 - **`test`:** Runs Vitest (see Recipe 32). Depends on `db:migrations:generate` so the schema the worker tests apply is never stale.
 
-**What `@pitlane/dev`'s `remix()` plugin provides:**
+**What `@pitlane/vite-plugin-remix`'s `remix()` plugin provides:**
 
 - **Build orchestration:** Builds SSR then client environments, with separate output directories (`dist/ssr`, `dist/client`)
 - **Preview server:** Loads the built SSR entry and creates a request listener for `vp preview`
-- **Client entry transforms:** Automatically resolves `import.meta.url` in `clientEntry()` calls to the correct asset URLs for both server and client environments
+- **Client entry transforms:** Rewrites `import.meta.url` in `clientEntry()` calls to a portable `file:app/…#ExportName` entry ID that `render({ assets })` resolves
+- **Asset manifest:** Composes `assets()` from `pitlane/assets/vite-plugin`, which supplies `pitlane/assets/manifest` and turns on Vite's chunk import map for the client build
 - **Error suppression:** Prevents abort errors from cancelled requests (e.g., search-as-you-type) from triggering the Vite error overlay
 
 **Commands:**
@@ -1988,10 +1990,11 @@ export default defineConfig({
 `app/actions/contacts/sidebar-item.tsx`, in full:
 
 ```tsx
+import { clientEntry, type Handle, type SerializableProps } from "remix/component";
+import { createMultiMatcher } from "remix/route-pattern/match";
+
 import { routes } from "#/routes.ts";
 import { isServer, onDestinationChange, pendingDestination } from "#/utils/pending-navigation.ts";
-import { createMultiMatcher } from "remix/route-pattern/match";
-import { clientEntry, type Handle, type SerializableProps } from "remix/ui";
 
 let matcher = createMultiMatcher<true>();
 matcher.add(routes.contacts.show.pattern, true);
@@ -2059,7 +2062,7 @@ export let SidebarItem = clientEntry(import.meta.url, (handle: Handle<SidebarIte
 **Why this is the one place a shared subscription survives.** Recipe 10's decision order rules out both cheaper options here:
 
 - The item can't `await navigate()`, because the runtime performs the navigation from the anchor itself; nothing in the component's own code starts it.
-- Frame `reloadStart`/`reloadComplete` can't drive it either, and this is the crux: when one item becomes active, the item **losing** active state must also re-render — and that component never received the click. It sits in the `sidebar` frame, which isn't the frame reloading (the click targets `detail`), so no frame event it can observe ever fires. `remix/ui` has no broadcast for "sibling components, your active state may have changed".
+- Frame `reloadStart`/`reloadComplete` can't drive it either, and this is the crux: when one item becomes active, the item **losing** active state must also re-render — and that component never received the click. It sits in the `sidebar` frame, which isn't the frame reloading (the click targets `detail`), so no frame event it can observe ever fires. `remix/component` has no broadcast for "sibling components, your active state may have changed".
 
 So the app owns a minimal primitive. `app/utils/pending-navigation.ts` is roughly 55 lines replacing a 111-line navigation state machine, and it exposes exactly three things:
 
@@ -2272,54 +2275,46 @@ async resolveFrame(src, options) {
 
 ---
 
-### 23. How do asset imports work in the document shell?
+### 23. How do asset URLs work in the document shell?
 
 **Decision:** How do I wire up scripts, stylesheets, and preload links in my HTML document?
 
-**Heuristic:** Use Vite's asset import specifiers to resolve paths at build time. Never hardcode asset paths in components.
+**Heuristic:** Ask the asset resolver for them by project-relative source path. Never hardcode asset paths in components.
 
-**The three import types:**
+**The resolver** (`app/assets.ts`):
 
-```tsx
-// Client entry module — resolves hydration script + its dependencies
-import clientAssets from "#/entry.browser.tsx?assets=client";
+```ts
+import { createAssetResolver } from "pitlane/assets";
+import manifest from "pitlane/assets/manifest";
 
-// SSR assets — resolves server-rendered module dependencies (CSS, JS preloads)
-import serverAssets from "#/entry.server.tsx?assets=ssr";
+export let assets = createAssetResolver(manifest);
 
-// Standalone stylesheet — resolves to a URL string
-import styles from "#/index.css?url";
+export let scriptEntry = await assets.getScriptEntry("app/entry.browser.tsx");
+export let stylesheets = await assets.getStylesheets("app/entry.server.tsx");
+export let indexStylesheetHref = await assets.getHref("app/index.css");
 ```
 
-**Merging assets in the document shell:**
+**Rendering them in the document shell:**
 
 ```tsx
-import { mergeAssets } from "@pitlane/dev/runtime";
-import clientAssets from "#/entry.browser.tsx?assets=client";
-import serverAssets from "#/entry.server.tsx?assets=ssr";
-import styles from "#/index.css?url";
+import { ImportMap } from "remix/component/server";
+
+import { indexStylesheetHref, scriptEntry, stylesheets } from "#/assets.ts";
 
 export function Document() {
-    let { css, js } = mergeAssets(clientAssets, serverAssets);
-
     return () => (
         <html lang="en">
             <head>
-                {/* Standalone CSS file — use ?url import */}
-                <link href={styles} rel="stylesheet" />
-
-                {/* Asset-resolved CSS from component modules */}
-                {css.map(attrs => (
-                    <link key={attrs.href} {...attrs} rel="stylesheet" />
+                <link href={indexStylesheetHref} rel="stylesheet" />
+                {stylesheets.map(href => (
+                    <link href={href} key={href} rel="stylesheet" />
                 ))}
 
-                {/* Client entry script */}
-                <script async src={clientAssets.entry} type="module" />
-
-                {/* Preload links for JS dependencies */}
-                {js.map(attrs => (
-                    <link key={attrs.href} {...attrs} rel="modulepreload" />
+                <ImportMap value={scriptEntry.importMap} />
+                {scriptEntry.preloads.map(href => (
+                    <link href={href} key={href} rel="modulepreload" />
                 ))}
+                <script async src={scriptEntry.href} type="module" />
             </head>
             <body>{/* ... */}</body>
         </html>
@@ -2329,11 +2324,11 @@ export function Document() {
 
 **Key rules:**
 
-- Use `?assets=client` for the client entry module (the one passed to `run()`)
-- Use `?assets=ssr` for server-rendered modules that contribute CSS or JS to the document. Only use this for module assets (`.tsx`, `.ts`), not plain `.css` files
-- Use `?url` for standalone stylesheets — this gives you a plain URL string for a `<link>` tag
-- Render `clientAssets.entry` as the `<script>` src — never hardcode `/remix/assets/...` paths
-- Pitlane transforms `import.meta.url` in strict, top-level `export const Name = clientEntry(import.meta.url, …)` calls into the correct `?assets=client` imports automatically, so component files remain source-oriented
+- Resolver keys are project-relative source paths, written as string literals
+- `getScriptEntry()` for the browser entry (the module that calls `run()`): its `href`, `preloads`, and `importMap`
+- `getStylesheets()` for the CSS a server module's graph imports; `getHref()` for a standalone file such as `app/index.css`
+- `<ImportMap>` must come before every `modulepreload` link and module script: the build emits a chunk import map
+- Pass the same `assets` to `render({ assets })` in `entry.server.tsx`; it resolves each island's `file:` entry ID and adds its `modulepreload` links
 
 ---
 
@@ -2355,7 +2350,7 @@ import styles from "#/index.css?url";
 **The `css()` mixin for component-scoped rules:**
 
 ```tsx
-import { css } from "remix/ui";
+import { css } from "remix/component";
 
 <button
     mix={[
@@ -2414,7 +2409,7 @@ When a value changes based on state, set a CSS custom property via `style` and r
 **Basic ref (fires on insert):**
 
 ```tsx
-import { ref } from "remix/ui";
+import { ref } from "remix/component";
 
 <input mix={[ref(node => node.focus())]} />;
 ```
@@ -2452,12 +2447,12 @@ return () => (
 
 **Decision:** How do I add enter, exit, or layout animations to elements?
 
-**Heuristic:** Use the animation mixins — `animateEntrance()`, `animateExit()`, and `animateLayout()`. Always provide a stable `key` on elements that should transition.
+**Heuristic:** Use the animation mixins — `animateEntrance()`, `animateExit()`, and `animateLayout()`. They ship in the separate `@remix-run/ui` package, so add that dependency before importing from `@remix-run/ui/animation`. Always provide a stable `key` on elements that should transition.
 
 **Enter animation:**
 
 ```tsx
-import { animateEntrance } from "remix/ui/animation";
+import { animateEntrance } from "@remix-run/ui/animation";
 
 <div
     mix={[
@@ -2474,7 +2469,7 @@ import { animateEntrance } from "remix/ui/animation";
 **Toggle visibility with enter + exit:**
 
 ```tsx
-import { animateEntrance, animateExit } from "remix/ui/animation";
+import { animateEntrance, animateExit } from "@remix-run/ui/animation";
 
 {
     isVisible && (
@@ -2497,7 +2492,7 @@ import { animateEntrance, animateExit } from "remix/ui/animation";
 **List reordering with layout animation:**
 
 ```tsx
-import { animateLayout, spring } from "remix/ui/animation";
+import { animateLayout, spring } from "@remix-run/ui/animation";
 
 {
     items.map(item => (
@@ -2534,60 +2529,54 @@ import { animateLayout, spring } from "remix/ui/animation";
 
 **Decision:** I need keyboard shortcuts, key-specific handlers, or unified pointer+keyboard press behavior.
 
-**Heuristic:** Use the built-in interaction helpers from `remix/ui` instead of writing your own keyboard/pointer normalization. Frame-targeted navigation needs no helper at all — it is a plain `data-rmx-target` attribute (see Recipe 15).
+**Heuristic:** Reach for a real interactive element first — `<button>`, `<a>`, `<input>` — and let the platform supply the keyboard and pointer semantics. Remix 3 ships no key or press helpers: `remix/component` exports `on()`, and key dispatch is branching you write yourself. Frame-targeted navigation needs no helper at all — it is a plain `data-rmx-target` attribute (see Recipe 15).
 
-**`keysEvents()` — key-specific host events:**
+**Key-specific handling — branch inside one `keydown` listener:**
 
 ```tsx
-import { keysEvents } from "remix/ui";
+import { on } from "remix/component";
 
 <div
     tabindex="0"
     mix={[
-        keysEvents({
-            Escape() {
+        on("keydown", event => {
+            if (event.key === "Escape") {
                 closePanel();
                 handle.update();
-            },
-            ArrowDown(event) {
+                return;
+            }
+
+            if (event.key === "ArrowDown" || event.key === "ArrowUp") {
                 event.preventDefault();
-                focusNextItem();
-            },
-            ArrowUp(event) {
-                event.preventDefault();
-                focusPreviousItem();
-            },
+                if (event.key === "ArrowDown") focusNextItem();
+                else focusPreviousItem();
+            }
         }),
     ]}
 />;
 ```
 
-Use `keysEvents()` when you need to respond to specific keys on a focusable element. It handles `keydown` dispatch by key name so you don't need to write `if (event.key === "Escape")` branching yourself.
+Keep the listener on the element that owns focus, and `preventDefault()` only the keys you actually consume — arrow keys scroll the page otherwise.
 
-**`pressEvents()` — unified pointer and keyboard input:**
+**Press behavior — prefer a real `<button>`:**
 
 ```tsx
-import { pressEvents } from "remix/ui";
-
-<div
-    role="button"
-    tabindex="0"
+<button
     mix={[
-        pressEvents({
-            onPress() {
-                toggleSelection();
-                handle.update();
-            },
-            onLongPress() {
-                openContextMenu();
-                handle.update();
-            },
+        on("click", () => {
+            toggleSelection();
+            handle.update();
         }),
     ]}
-/>;
+    type="button"
+>
+    Select
+</button>
 ```
 
-Use `pressEvents()` when a non-button element needs to behave like an interactive control across both pointer and keyboard input. It normalizes click, touch, and Enter/Space into a single interaction model.
+A `<button>` already fires `click` for pointer taps, Enter, and Space, and it is focusable and announced as a control. When the host genuinely can't be a button, you own the whole contract: `role="button"`, `tabindex="0"`, an `on("click")` handler, and an `on("keydown")` that calls the same handler for `Enter` and `" "`. Long press has no built-in either — build it from `pointerdown`/`pointerup` and a timer, and only when the interaction is real.
+
+For the composite controls that need this machinery — menus, listboxes, comboboxes, selects, tabs — install `@remix-run/ui` and import the headless primitive (`@remix-run/ui/menu`, `@remix-run/ui/listbox`, …) rather than re-deriving focus and key handling.
 
 **Frame targeting needs no mixin.**
 
@@ -2599,7 +2588,7 @@ Set `data-rmx-target` directly on the `<a>` or `<form>` that navigates — both 
 </a>
 ```
 
-Prefer real `<a>` tags and `<form><button type="submit">` pairs — they're accessible and work without JavaScript. `remix/ui` also exports a `link()` mixin that makes any element behave like a navigation link, but it is a _link_ mixin: on a non-anchor host it sets `role="link"` and navigates from a `preventDefault`ed click. Reserve it for cases where an anchor isn't practical, and never put it on a submit button — it would cancel the submission.
+Prefer real `<a>` tags and `<form><button type="submit">` pairs — they're accessible and work without JavaScript. `remix/component` also exports a `link()` mixin that makes any element behave like a navigation link, but it is a _link_ mixin: on a non-anchor host it sets `role="link"` and navigates from a `preventDefault`ed click. Reserve it for cases where an anchor isn't practical, and never put it on a submit button — it would cancel the submission.
 
 ---
 
@@ -2768,7 +2757,7 @@ on("pointerdown", event => {
 **Basic mixin — pure prop transform:**
 
 ```tsx
-import { createMixin } from "remix/ui";
+import { createMixin } from "remix/component";
 
 let withTitle = createMixin(() => (title: string, props: { title?: string }) => (
     <handle.element {...props} title={title} />
@@ -2926,7 +2915,7 @@ export default defineConfig({
 
 Four details that are easy to get wrong:
 
-- **The app's Vite plugins belong in both projects.** `@pitlane/dev`'s `remix()` provides `clientEntry()`, `?assets=ssr` and `pitlane:dev`. Without it the module graph will not even import.
+- **The app's Vite plugins belong in both projects.** `@pitlane/vite-plugin-remix`'s `remix()` provides the `clientEntry()` transform and `pitlane/assets/manifest`. Without it the module graph will not even import.
 - **Component HMR must be filtered out of the `dom` project.** It rewrites modules to talk to a dev-server registry no test runtime provides, and fails with `Cannot read properties of undefined (reading 'componentNamesByModuleUrl')`. It is a `vite dev` concern.
 - **D1 needs its schema as data.** Workerd has no filesystem, so `readD1Migrations()` reads the generated SQL in Node at config time and a setup file applies it with `applyD1Migrations()`. `vp run test` depends on `db:migrations:generate` so the two cannot drift.
 - **Set `NODE_ENV=test` as a binding.** `fakeNetwork()` sleeps 1–3s per uncached call unless it sees it, and workerd does not set it. Worth 9.1s → 1.6s on this suite.
@@ -2954,11 +2943,11 @@ describe("missing contacts", () => {
 
 This runs the whole stack — middleware, method override, router, controller, render middleware, D1. `SELF` from `cloudflare:test` does the same thing and is deprecated in favour of the above.
 
-**Component test** — `render()` from `remix/ui/test` works unchanged under jsdom:
+**Component test** — `render()` from `remix/component/test` works unchanged under jsdom:
 
 ```tsx
+import { render } from "remix/component/test";
 import { describe, expect, it, onTestFinished } from "vitest";
-import { render } from "remix/ui/test";
 
 describe("FavoriteButton", () => {
     it("shows the current state but submits the desired one", () => {
@@ -2996,8 +2985,8 @@ describe("FavoriteButton", () => {
 
 ```tsx
 import { createCookie } from "remix/cookie";
-import { Session } from "remix/session";
 import { session } from "remix/middleware/session";
+import { Session } from "remix/session";
 import { createCookieSessionStorage } from "remix/session-storage/cookie";
 
 // 1. Create a signed cookie (secrets are required)
@@ -3123,8 +3112,8 @@ session.destroy(); // Clears all data, clears client cookie on next response
 
 ```tsx
 import { auth, createSessionAuthScheme, requireAuth } from "remix/middleware/auth";
-import { Session } from "remix/session";
 import { session } from "remix/middleware/session";
+import { Session } from "remix/session";
 
 let router = createRouter({
     middleware: [
@@ -3234,8 +3223,9 @@ The logout form is also a plain `<form method="POST">` — no JavaScript require
 **Protecting routes:**
 
 ```tsx
-import { Auth, requireAuth } from "remix/middleware/auth";
 import type { GoodAuth } from "remix/middleware/auth";
+
+import { Auth, requireAuth } from "remix/middleware/auth";
 
 router.map(routes.dashboard, {
     middleware: [requireAuth()],
@@ -3313,9 +3303,7 @@ import { createBearerTokenAuthScheme, createSessionAuthScheme } from "remix/midd
 
 auth({
     schemes: [
-        createSessionAuthScheme({
-            /* ... */
-        }),
+        createSessionAuthScheme({/* ... */}),
         createBearerTokenAuthScheme({
             async verify(token) {
                 return apiKeys.validate(token);
@@ -3338,9 +3326,10 @@ auth({
 ```tsx
 import type { FileUpload } from "remix/form-data-parser";
 
+import { env } from "cloudflare:workers";
+
 import { R2FileStorage } from "#/data/adapters/r2-file-storage.ts";
 import { routes } from "#/routes.ts";
-import { env } from "cloudflare:workers";
 
 const ALLOWED_TYPE: Record<string, true> = {
     "image/avif": true,
@@ -3569,10 +3558,10 @@ The `#` prefix is the only one that works everywhere without configuration beyon
         "lib": ["DOM", "DOM.Iterable", "ESNext"],
         "target": "ESNext",
         "module": "ESNext",
-        "types": ["@types/node", "vite-plus/client", "@pitlane/dev/assets"],
+        "types": ["@types/node", "vite-plus/client"],
         "moduleResolution": "bundler",
         "jsx": "react-jsx",
-        "jsxImportSource": "remix/ui",
+        "jsxImportSource": "remix/component",
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "allowImportingTsExtensions": true,
@@ -3646,7 +3635,7 @@ Wire this into your `vite.config.ts` as a run task so types are regenerated when
 run: {
     tasks: {
         typegen: {
-            input: ["wrangler.jsonc"],
+            cache: { input: ["wrangler.jsonc"] },
             command: "wrangler types",
         },
     },
@@ -3662,8 +3651,8 @@ let db = env.DB;
 let bucket = env.FILES;
 
 // In middleware (preferred — inject into request context)
-import { createD1Database } from "@pitlane/data-table-d1";
 import { env } from "cloudflare:workers";
+import { createD1Database } from "pitlane/data-table-d1";
 import { Database } from "remix/data-table";
 import { type Middleware } from "remix/router";
 
@@ -3693,14 +3682,14 @@ export function database(): Middleware<DatabaseEntry> {
 Don't hand-write an adapter. `@pitlane/data-table-d1` supplies `createD1Database(binding, options?)`, which returns a `D1Database extends Database<"sqlite">` — every query, persistence, and migration method comes from `remix/data-table` unchanged:
 
 ```tsx
-import { createD1Database } from "@pitlane/data-table-d1";
 import { env } from "cloudflare:workers";
+import { createD1Database } from "pitlane/data-table-d1";
 
 let db = createD1Database(env.DB);
 let contacts = await db.findMany(Contacts);
 ```
 
-Its Node-only migration half lives behind a separate `@pitlane/data-table-d1/migrations` entry point so nothing from it can reach a Worker bundle — see Recipe 18.
+Its Node-only migration half lives behind a separate `pitlane/data-table-d1/migrations` entry point so nothing from it can reach a Worker bundle — see Recipe 18.
 
 **D1 limitations to know:**
 

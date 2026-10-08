@@ -1,13 +1,15 @@
-import contacts from "#/actions/contacts/controller.tsx";
-import controller from "#/actions/controller.tsx";
-import { database, uploadErrors } from "#/middleware.ts";
-import { routes } from "#/routes.ts";
-import { UPLOAD_LIMITS, uploadHandler } from "#/utils/uploads.ts";
 import { asyncContext } from "remix/middleware/async-context";
 import { formData } from "remix/middleware/form-data";
 import { methodOverride } from "remix/middleware/method-override";
 import { render } from "remix/middleware/render";
 import { createRouter, type MiddlewareContext } from "remix/router";
+
+import contacts from "#/actions/contacts/controller.tsx";
+import controller from "#/actions/controller.tsx";
+import { assets } from "#/assets.ts";
+import { database, uploadErrors } from "#/middleware.ts";
+import { routes } from "#/routes.ts";
+import { UPLOAD_LIMITS, uploadHandler } from "#/utils/uploads.ts";
 
 // Static assets are served by Cloudflare's `assets` binding (wrangler.jsonc),
 // which runs ahead of the Worker — `staticFiles()` is Node-fs-based and has no
@@ -19,6 +21,7 @@ let middleware = [
     asyncContext(),
     database(),
     render({
+        assets,
         onError(error) {
             // Streaming render failures. The middleware suppresses this for its
             // own internal frame sub-requests, so it reports once per request.
@@ -27,7 +30,7 @@ let middleware = [
     }),
 ] as const;
 
-declare module "remix/router" {
+declare module "remix" {
     interface RouterTypes {
         context: MiddlewareContext<typeof middleware>;
     }
